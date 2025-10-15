@@ -1,8 +1,8 @@
 student:
-  name: "Bilicki Viktor"
-  id: "BILICCI"
+  name: "Tompa Márton"
+  id: "ZI3X3C"
 project:
-  title: "ResearchFlow – szakdolgozatkutatás-támogató webalkalmazás"
+  title: "ProdCty – Audiómegosztó közösségi média, producereknek és zeneszerzőknek"
   product_ml_features: false
 ai:
   log_min_entries_per_sprint: 3
