@@ -1,47 +1,49 @@
 meta:
   version: "0.1"
-  last_updated: "2025-02-14"
+  last_updated: "2025-10-15"
 problem:
-  statement: "A magyar mérnökinformatikus hallgatók számára a szakdolgozati források rendszerezése és hivatkozásainak kezelése széttagolt és időrabló feladat, ami csúszásokhoz és minőségi problémákhoz vezet."
+  statement: "A legtöbb jelenlegi platform fizetős, és hiányzik egy olyan közösségi tér, ahol a producerek felfedezhetik mások munkáit, visszajelzést kaphatnak, és akár inspirálódni tudjanak."
 target_audience:
   personas:
-    - name: "Anna, a kutató alapszakos"
-      segment: "Harmadéves mérnökinformatikus hallgató, aki a szakdolgozatához gyűjt forrásokat."
+    - name: "Alex,egy feltörekvő producer"
+      segment: "Egy fiatal producer, aki tehetségét online szeretné megosztani, hogy inspirálódjon"
       needs:
-        - "Gyors forrásgyűjtés megbízható jegyzeteléssel"
-        - "Automatikus hivatkozásgenerálás különböző formátumokhoz"
-        - "Egyszerű együttműködés konzulenssel"
-    - name: "Bence, az esti képzésen"
-      segment: "Munka mellett tanuló levelezős hallgató."
+        - "Lehetőség zenéjének megosztására anélkül, hogy elveszne más típusú tartalmak között"
+        - "Lehetőség más producerek/zeneszerzők visszajelzésére"
+        - "Hozzáférés ingyenes, licencmentes audioanyagokhoz a kreatív munkához"
+    - name: "Péter, egy gitárjátékos"
+      segment: "Egy fiatal hallgató, aki szívesen inspirálódna más zenészek játékából és szeretné saját zenéjét megosztani."
       needs:
-        - "Időhatékony anyagfeldolgozás"
-        - "Offline hozzáférés a jegyzetekhez"
+        - "Konstruktív jellegű kritika a játékára"
+        - "Tippek, tanácsok más, tapasztaltabb játékosoktól"
 value_proposition:
-  concise: "A ResearchFlow egy felhőalapú kutatási munkafolyamat-kezelő, amely összefogja a források gyűjtését, jegyzetelését és hivatkozás-generálását, így a hallgatók 30%-kal gyorsabban tudnak haladni a szakdolgozatukkal a manuális táblázatokhoz képest."
+  concise: "A ProdCity egy közösségi audióplatform producereknek és zeneszerzőknek, ahol zenéiket könnyen megoszthatják és ismertté válhatnak anélkül, hogy videót is kellene készíteniük."
   differentiators:
-    - "Kontextusérzékeny MI-ajánlások a jegyzetek rendszerezéséhez"
-    - "Közös munkafelület konzulensi megjegyzésekkel"
+    - "Kifejezetten audiofókuszú, nem szükséges videós tartalom"
+    - "Lehetőség producer-specifikus közönség elérésére"
+    - "Egyszerű feltöltés, rendszerezés és visszajelzés a zenékre"
 scope:
   in:
-    - "Források rögzítése böngészőből vagy kézi űrlapból"
-    - "Jegyzetek és címkék kezelése"
-    - "Automatikus hivatkozás generálás APA és IEEE formátumban"
+    - "Zene- és audiófájlok feltöltése és rendszerezése"
+    - "Közösségi funkciók: visszajelzés és kommentek"
+    - "Felhasználói zeneműfaj-preferenciák megadása a ForYou fülhöz(pl.:rock, boom bap, reggae)"
+    - "Mindenes fül a véletlenszerű feltöltésekhez"
   out:
-    - "Offline desktop alkalmazás"
-    - "Teljes szövegű PDF-szerkesztés"
-    - "Automatikus plágium-ellenőrzés"
+    - "MI-alapú címkézés és ajánlórendszer"
+    - "Automatikus 'aura' generálás mp3-hoz"
+    - "Hozzáférés licencmentes audioanyagokhoz"
 success_metrics:
-  - "≥10 korai tesztelő aktívan használja a ResearchFlow-t a szakdolgozat előkészítéséhez."
-  - "A tesztelők átlagos elégedettsége ≥4/5 az onboarding után."
-  - "A forrásbeviteli idő 30%-kal csökken a kontrollcsoporthoz képest."
+  - "≥10 korai felhasználó aktívan feltölt zenét és használja a platformot"
+  - "A felhasználók átlagos elégedettsége ≥4/5 a regisztráció és első feltöltés után"
+  - "Legalább 50 zenefeltöltés az első hónapban a korai felhasználóktól"
 risks:
-  - "Adatvédelmi elvárások az egyetemi szabályzatok miatt"
-  - "A felhasználók meglévő munkafolyamatainak megváltoztatása ellenállást válthat ki"
+  - "A felhasználók nehezen szokhatnak rá az új platformra a már meglévő közösségi média csatornáik mellett"
+  - "Feltöltött zenék jogi státusza: minden fájlnak royalty-free vagy public domain/CC0 licencűnek kell lennie"
 first_tech_decision_ref: "sprints/01/architecture/adr/0001-first-tech-choice.md"
 research_summary:
   insights:
-    - "A hallgatók ~60%-a jelenleg Google Sheetben vezeti a forrásokat, ami nehezen kereshető."
-    - "Az interjúalanyok fele külön eszközt használ jegyzetelésre, ami duplikált munkát okoz."
+    - "A producerek gyakran küzdenek azzal, hogy a zenéjük ne vesszen el a TikTok vagy más vizuális platformok tartalmai között."
+    - "A zenészek gyakran keresnek ingyenes, licencmentes audioanyagokat a kreatív munkájukhoz."
   pain_points:
-    - "Hosszú idő a hivatkozások formázása"
-    - "Nehezen megosztható a konzulensekkel a munka aktuális állapota"
+    - "A jelenlegi közösségi platformokon az audio csak vizuális tartalommal együtt jelenik meg."
+    - "Hiányzik egy felhasználóbarát, kizárólag audiofókuszú tér a zenék megosztására és felfedezésére."
