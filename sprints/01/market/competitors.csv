@@ -1,4 +1,4 @@
 name,url,pricing_model,key_strengths,key_weaknesses
-Notion,https://www.notion.so,freemium,"Rugalmas adatbázis;Széles sablongyűjtemény","Nincs natív hivatkozásformázás;Konfigurációs időigény"
-Zotero,https://www.zotero.org,open_source,"Automatikus bibliográfia;Bővítmények","Meredek tanulási görbe;Korlátozott együttműködés"
-Mendeley,https://www.mendeley.com,freemium,"Cikkajánló motor;PDF annotáció","Szinkronizációs problémák;Adatvédelmi aggályok"
+Splice,https://splice.com,subscription,"Rendkívül diverz sample-könyvtár minden zenei műfajhoz;Egyszerű és letisztult felhasználói felület;DAW-integráció a gyors munkafolyamatért","Letöltések creditrendszerhez kötve;Drága havi előfizetés;Közösségi funkciók hiánya"
+BandLab,https://www.bandlab.com,free,"Teljesen ingyenes DAW és közösségi platform; Valós idejű kollaboráció; Mobil és webapp integráció","Komplex felület kezdőknek; Feltöltött zenék nem szűrhetők műfaj szerint; Audiofókusz helyett inkább zenekészítő eszköz"
+Tracklib,https://www.tracklib.com,subscription,"Jogtiszta, profi hangminták; Különböző zenei műfajokból; Könnyen integrálható DAW-ba","Előfizetéshez kötött; Licencfeltételek korlátozzák a felhasználást; Nem közösségi platform"
