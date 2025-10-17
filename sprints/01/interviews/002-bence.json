@@ -1,21 +1,25 @@
 {
   "id": "INT-002",
-  "date": "2025-02-06",
-  "method": "in_person",
+  "date": "2025-10-17",
+  "method": "Online",
   "participant": {
-    "pseudonym": "Bence",
-    "segment": "Levelezős hallgató, aki munka mellett ír szakdolgozatot"
+    "pseudonym": "János",
+    "segment": "Egyetemi hallgató, zenekarban gitáros."
   },
   "consent": true,
   "insights": [
-    "Munka utáni időben mobilon is szeretne jegyzetelni.",
-    "Naptárban jelöli, hogy melyik forrást mikor dolgozta fel." 
+    "A hivatalos zenemegosztás (pl. Spotify) sok adminisztrációval és extra költséggel jár, ami nehezíti az induló zenészek megjelenését.",
+    "A közösségi platformokon (TikTok, Instagram) nem lehet hosszabb zenéket feltölteni, így korlátozott a kreatív önkifejezés lehetősége.",
+    "Hiányzik egy olyan tér, ahol a különböző zenei stílusok (pl. rock, elektronikus, indie) jól kategorizálva, célzottan jelenhetnének meg."
   ],
   "pain_points": [
-    "Nem fér hozzá a céges gépen a személyes Google Drive-jához.",
-    "A bibliográfia frissítése manuális és hibás." 
+    "A zenék publikálása bonyolult, külön engedélyekkel és díjakkal jár (pl. DistroKid).",
+    "A jelenlegi platformokon a zenék csak részletekben, 'sound'-ként oszthatók meg, ami nem ad teljes képet a műről.",
+    "A visszajelzések főként személyes vagy ismerősi körből érkeznek, hiányzik a szélesebb szakmai közegből jövő kritika."
   ],
   "quotes": [
-    "\"Ha lenne egy gomb, ami generálja a hivatkozást, azzal órákat spórolnék hetente.\""
+    "\"A Spotifyra feltöltés előtt meg kellett oldani az artist use engedélyt, meg kifizetni a DistroKidet is.\"",
+    "\"Tiktokra csak rövid részletet tudok feltölteni, pedig van, hogy az egész szám hangulatát az utolsó harmad adja.\"",
+    "\"Jó lenne, ha a platform tudná, milyen stílusú zenéket szeretek, és annak megfelelően ajánlana más előadókat is.\""
   ]
 }
