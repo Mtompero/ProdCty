@@ -42,8 +42,9 @@ risks:
 first_tech_decision_ref: "sprints/01/architecture/adr/0001-first-tech-choice.md"
 research_summary:
   insights:
-    - "A producerek gyakran küzdenek azzal, hogy a zenéjük ne vesszen el a TikTok vagy más vizuális platformok tartalmai között."
-    - "A zenészek gyakran keresnek ingyenes, licencmentes audioanyagokat a kreatív munkájukhoz."
+    - "A zenészek számára fontos, hogy a visszajelzések ne csak mennyiségiek, hanem szakmai értékűek legyenek."
+    - "A producerek és előadók igényelnének egy közösségi teret, ahol hasonló érdeklődésű, szakmai felhasználókkal léphetnek kapcsolatba."
   pain_points:
-    - "A jelenlegi közösségi platformokon az audio csak vizuális tartalommal együtt jelenik meg."
-    - "Hiányzik egy felhasználóbarát, kizárólag audiofókuszú tér a zenék megosztására és felfedezésére."
+    - "A jelenlegi platformok (TikTok, Instagram) elsősorban vizuális tartalomra épülnek, ezért az audio háttérbe szorul."
+    - "A feltöltési folyamat időigényes, a különböző formátumok és platformok között sok az átfedés."
+    - "Nehéz elérni, hogy a zenéket releváns, szakmai közönség hallgassa meg és adjon visszajelzést."
