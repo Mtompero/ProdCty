@@ -1,0 +1,24 @@
+{
+  "id": "INT-003",
+  "date": "2025-10-17",
+  "method": "Online",
+  "participant": {
+    "pseudonym": "Levi",
+    "segment": "Friss diplomás szlavisztika szakos hallgató, hobbiproducer, aki saját beateket készít, de nem publikálja őket nyilvánosan"
+  },
+  "consent": true,
+  "insights": [
+    "Elsősorban önkifejezésként készít zenét, nem a közönség elérésére fókuszál.",
+    "Hiányzik egy közeg, ahol biztonságosan megoszthatná a munkáit és szakmai visszajelzést kaphatna.",
+    "Motiválná, ha lenne lehetősége más producerekkel tapasztalatot cserélni, akár zárt körben."
+  ],
+  "pain_points": [
+    "Nincs olyan felület, ahol magabiztosan megmutathatná a zenéit anélkül, hogy nyilvánosság elé tárná őket.",
+    "A zárt, szakmai közösségek nehezen elérhetők kezdőként.",
+    "A visszajelzés hiánya miatt lassabban fejlődik és kevésbé motivált."
+  ],
+  "quotes": [
+    "\"Nem akarom feltölteni, amíg nem érzem elég jónak, de jó lenne, ha valaki szakmailag ránézne.\"",
+    "\"Néha csak magamnak csinálom, de hiányzik valami közösségi visszajelzés.\""
+  ]
+}
