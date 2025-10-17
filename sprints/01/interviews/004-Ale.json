@@ -1,0 +1,24 @@
+{
+  "id": "INT-004",
+  "date": "2025-10-17",
+  "method": "Online",
+  "participant": {
+    "pseudonym": "Ale",
+    "segment": "Olasz producer, feltörekvő beatmaker, aki professzionális projekteken dolgozik és nemzetközi közönséget épít"
+  },
+  "consent": true,
+  "insights": [
+    "A nemzetközi zenei közösségekben fontos a gyors visszajelzés és a szakmai kapcsolatépítés.",
+    "Hiányzik egy olyan tér, ahol különböző szintű producerek tudnának együttműködni és tanulni egymástól.",
+    "Az algoritmusok nem mindig segítik a kisebb, de minőségi előadókat."
+  ],
+  "pain_points": [
+    "A mainstream platformok nem támogatják a producer–producer kapcsolatokat.",
+    "A felfedezhetőség nagyban függ a marketingtől, nem a zene minőségétől.",
+    "Kevés lehetőség van szakmai mentorálásra vagy hiteles visszajelzésre."
+  ],
+  "quotes": [
+    "\"A TikTokon nem az számít, mennyire jó a beat, hanem mennyire trendi a videó.\"",
+    "\"Szeretnék olyan helyet, ahol a producerek egymást is segítik, nem csak versenyeznek.\""
+  ]
+}
