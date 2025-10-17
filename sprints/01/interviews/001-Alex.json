@@ -1,0 +1,25 @@
+{
+  "id": "INT-001",
+  "date": "2025-10-17",
+  "method": "Online",
+  "participant": {
+    "pseudonym": "Alex",
+    "segment": "Programtervező informatikus hallgató és hobbidobos, aki főként Instagramon és TikTokon osztja meg zenéit"
+  },
+  "consent": true,
+  "insights": [
+    "A videók utómunkája (vágás, hangbeállítás, feltöltés) sok időt vesz igénybe, ami visszatartja a rendszeres posztolást.",
+    "A visszajelzések minőségét többre tartja a mennyiségnél — számára a személyes vagy szakmai vélemények értékesebbek, mint az ismeretlen kommentek.",
+    "Hiányolja, hogy a jelenlegi platformokon nem különül el a szakmai és laikus közönség, így nehéz értékelni a valódi szakmai visszajelzéseket."
+  ],
+  "pain_points": [
+    "Időigényes a tartalomkészítés és az utómunka.",
+    "A jelenlegi platformokon a tartalmak inkább laikus közönséghez jutnak el, miközben a zenészek számára értékesebb lenne, ha szakmai közösség (pl. más producerek, zenészek) látnák és értékelnék őket.",
+    "A felhasználók értékelik a visszajelzéseket, de a jelenlegi platformokon nehéz elérni, hogy azok releváns, szakmai nézőpontból érkezzenek."
+  ],
+  "quotes": [
+    "\"Sok idő, mire a videót összevágom, és csak utána tudom feltölteni.\"",
+    "\"Mélyebb értéket ad, ha a visszajelzés szakmai hozzáértőktől érkezik.\"",
+    "\"Jó lenne, ha látnám, ki profi és ki nem, amikor véleményt ír.\""
+  ]
+}
