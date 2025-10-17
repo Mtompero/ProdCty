@@ -1,0 +1,24 @@
+{
+  "id": "INT-005",
+  "date": "2025-10-17",
+  "method": "Online",
+  "participant": {
+    "pseudonym": "Vendel",
+    "segment": "Kezdő beatmaker, aki most tanulja a zeneprogramokat és YouTube-on keres inspirációt"
+  },
+  "consent": true,
+  "insights": [
+    "A kezdők számára nehéz eligazodni a zenei eszközök és platformok között.",
+    "Sok inspirációt merít YouTube-ról és Redditről, de kevés közvetlen visszajelzést kap.",
+    "Egy közösségi felület, ahol kérdezhetne és tanulhatna, nagy segítség lenne."
+  ],
+  "pain_points": [
+    "A jelenlegi platformok nem támogatóak a kezdők számára.",
+    "A visszajelzések hiánya miatt lassabban fejlődik.",
+    "A tutorialok gyakran felszínesek vagy nem magyar nyelvűek."
+  ],
+  "quotes": [
+    "\"Néha feltöltöm a beatet YouTube-ra, de alig kapok reakciót.\"",
+    "\"Jó lenne, ha lenne egy hely, ahol kezdőként is kaphatnék érdemi tanácsot.\""
+  ]
+}
