@@ -1,0 +1,12 @@
+{
+  "name": "prodcty-backend",
+  "version": "0.1.0",
+  "description": "ProdCty Sprint 2 - minimal backend for tests",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-junit": "^16.0.0"
+  }
+}

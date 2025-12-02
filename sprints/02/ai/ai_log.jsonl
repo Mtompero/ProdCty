@@ -1,0 +1,7 @@
+{"date":"2025-11-25","tool":"ChatGPT","task":"Wireframe készítés","decision":"3 alapképernyő készült: Samples, Upload, My Tracks.","artifacts":["wireframes/samples.png","wireframes/upload.png","wireframes/mytracks.png"],"notes":"MVP-hez igazítva."}
+
+{"date":"2025-11-25","tool":"ChatGPT","task":"User Story frissítés","decision":"US-01 átírva a Samples első belépési nézetre.","artifacts":["sprints/02/stories/user_stories.md"],"notes":"Üres lista helyett Samples feed."}
+
+{"date":"2025-11-25","tool":"ChatGPT","task":"Acceptance tesztek írása","decision":"3 feature: samples_landing, upload_success, upload_error.","artifacts":["tests/acceptance/*.feature"],"notes":"Sprint 2 kritikus flow-jait fedi."}
+
+{"date":"2025-11-25","tool":"ChatGPT","task":"Tech stack ADR","decision":"React + Node.js + Express alapú MVP.","artifacts":["sprints/02/adr/0001-platform-decision.md"],"notes":"Egyszerű, bővíthető stack."}
