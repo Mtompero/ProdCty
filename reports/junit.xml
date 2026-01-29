@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites name="jest tests" tests="6" failures="0" errors="0" time="0.191">
-  <testsuite name="trackService" errors="0" failures="0" skipped="0" timestamp="2026-01-29T12:50:42" time="0.156" tests="6">
-    <testcase classname="trackService valid track passes validation" name="trackService valid track passes validation" time="0.001">
+  <testsuite name="trackService" errors="0" failures="0" skipped="0" timestamp="2026-01-29T14:21:19" time="0.155" tests="6">
+    <testcase classname="trackService valid track passes validation" name="trackService valid track passes validation" time="0.002">
     </testcase>
-    <testcase classname="trackService track with empty title is invalid" name="trackService track with empty title is invalid" time="0.001">
+    <testcase classname="trackService track with empty title is invalid" name="trackService track with empty title is invalid" time="0">
     </testcase>
-    <testcase classname="trackService track with non-positive length is invalid" name="trackService track with non-positive length is invalid" time="0">
+    <testcase classname="trackService track with non-positive length is invalid" name="trackService track with non-positive length is invalid" time="0.001">
     </testcase>
-    <testcase classname="trackService addTrack adds a new track with id" name="trackService addTrack adds a new track with id" time="0.001">
+    <testcase classname="trackService addTrack adds a new track with id" name="trackService addTrack adds a new track with id" time="0">
     </testcase>
-    <testcase classname="trackService addTrack throws on invalid track" name="trackService addTrack throws on invalid track" time="0.006">
+    <testcase classname="trackService addTrack throws on invalid track" name="trackService addTrack throws on invalid track" time="0.005">
     </testcase>
-    <testcase classname="trackService filterByGenre returns only matching tracks" name="trackService filterByGenre returns only matching tracks" time="0">
+    <testcase classname="trackService filterByGenre returns only matching tracks" name="trackService filterByGenre returns only matching tracks" time="0.001">
     </testcase>
   </testsuite>
 </testsuites>
