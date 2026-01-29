@@ -1,0 +1,3 @@
+{"date":"2025-11-26","tool":"ChatGPT","task":"Sprint 3 scope rögzítése","decision":"Feed és komment funkciók bekerülnek Sprint 3-ba.","artifacts":["sprints/03/spec/product_spec_v0.3.md"],"notes":"Sprint 2 logikus folytatása."}
+{"date":"2025-11-26","tool":"ChatGPT","task":"Feed stratégia döntés","decision":"Egyszerű lista, legfrissebb elöl.","artifacts":["sprints/03/adr/0004-feed-strategy.md"],"notes":"Gyors MVP megvalósítás."}
+{"date":"2025-11-26","tool":"ChatGPT","task":"Komment tárolás döntés","decision":"In-memory struktúra használata.","artifacts":["sprints/03/adr/0005-comments-storage.md"],"notes":"Később DB-re váltható."}

@@ -1,0 +1,3 @@
+- feed.png – központi feed nézet
+- track_detail_comments.png – track részletek és kommentek
+- profile.png – felhasználói profil alapnézet

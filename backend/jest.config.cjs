@@ -5,7 +5,7 @@ module.exports = {
   collectCoverage: true,
   collectCoverageFrom: ['src/**/*.js'],
   coverageDirectory: '../reports',
-  coverageReporters: ['cobertura'], // ez lesz a coverage.xml
+  coverageReporters: ['cobertura'], 
   reporters: [
     'default',
     ['jest-junit', {
