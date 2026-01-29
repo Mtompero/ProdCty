@@ -1,0 +1,17 @@
+# ProdCty – Sprint 2 – Deployment Target
+
+environment: "preview"
+service: "prodcty-web"
+version: "0.2"
+
+routes:
+  - path: "/"
+    healthcheck: "/health"
+  - path: "/tracks"
+    healthcheck: "/health"
+
+artifact:
+  type: "static"
+  location: "dist/"
+
+smoke_test: "scripts/smoke.http"

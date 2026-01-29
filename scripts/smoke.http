@@ -1,0 +1,15 @@
+### Smoke Test – Home
+GET http://localhost:3000/
+Accept: application/json
+
+### Smoke Test – Tracks list
+GET http://localhost:3000/tracks
+Accept: application/json
+
+### Smoke Test – Upload endpoint
+POST http://localhost:3000/tracks
+Content-Type: application/json
+
+{
+  "test": true
+}
