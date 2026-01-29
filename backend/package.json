@@ -3,10 +3,16 @@
   "version": "0.1.0",
   "description": "ProdCty Sprint 2 - minimal backend for tests",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "start": "node src/server."
   },
   "devDependencies": {
     "jest": "^29.7.0",
     "jest-junit": "^16.0.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
   }
 }

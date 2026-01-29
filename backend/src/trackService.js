@@ -1,24 +1,32 @@
 function validateTrack(track) {
   if (!track) return false;
-  if (typeof track.title !== 'string' || track.title.trim() === '') return false;
-  if (typeof track.genre !== 'string' || track.genre.trim() === '') return false;
-  if (typeof track.lengthSec !== 'number' || track.lengthSec <= 0) return false;
-  return true;
+
+  const titleOk = typeof track.title === "string" && track.title.trim().length > 0;
+  const lengthOk = typeof track.lengthSec === "number" && track.lengthSec > 0;
+
+  return titleOk && lengthOk;
 }
 
 function addTrack(tracks, track) {
-  if (!validateTrack(track)) {
-    throw new Error('Invalid track');
-  }
-  return [...tracks, { ...track, id: tracks.length + 1 }];
+  if (!Array.isArray(tracks)) throw new Error("tracks must be an array");
+  if (!validateTrack(track)) throw new Error("Invalid track");
+
+  const newTrack = {
+    id: tracks.length + 1,
+    ...track,
+  };
+
+  tracks.push(newTrack);
+  return tracks;
 }
 
 function filterByGenre(tracks, genre) {
-  return tracks.filter(t => t.genre === genre);
+  if (!Array.isArray(tracks)) throw new Error("tracks must be an array");
+  return tracks.filter((t) => t.genre === genre);
 }
 
 module.exports = {
   validateTrack,
   addTrack,
-  filterByGenre
+  filterByGenre,
 };
