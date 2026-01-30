@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ProdCty Demo</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <span class="name">ProdCty</span>
+      <span class="tag">demo</span>
+    </div>
+    <div class="right">
+        <span id="loginStatus" class="status">Logged in</span>
+        <button id="logoutBtn" class="btn small">Logout</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel">
+      <h2>Create track (demo)</h2>
+      <p class="muted">This does not upload an audio file yet — only metadata for the demo.</p>
+
+      <form id="createForm" class="form">
+        
+        <label>
+          Title
+          <input name="title" placeholder="Lo-fi beat" required />
+        </label>
+
+        <label>
+          Genre
+          <input name="genre" placeholder="lofi" />
+        </label>
+
+        <button class="btn primary" type="submit">Create</button>
+        <div id="createMsg" class="msg"></div>
+      </form>
+
+      <hr class="sep" />
+
+      <h2>Comments</h2>
+      <p class="muted">Select a track from the feed to view/add comments.</p>
+
+        <form id="commentForm" class="form">
+        <div class="muted">
+            Selected track:
+            <strong id="selectedTrackTitle">None</strong>
+        </div>
+
+        <input type="hidden" id="commentTrackId" name="trackId" />
+
+        <label>
+            Text
+            <input name="text" placeholder="Nice beat!" required />
+        </label>
+
+        <button class="btn" type="submit">Add comment</button>
+        <div id="commentMsg" class="msg"></div>
+        </form>
+
+
+      <div class="comments">
+        <h3>Comment list</h3>
+        <div id="commentList" class="list muted">No track selected.</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Feed</h2>
+        <button id="refreshBtn" class="btn">Refresh</button>
+      </div>
+
+      <div id="feed" class="feed"></div>
+      <div id="feedEmpty" class="empty muted">No items yet. Create a track on the left.</div>
+    </section>
+  </main>
+
+
+
+  <script src="./app.js"></script>
+</body>
+</html>
