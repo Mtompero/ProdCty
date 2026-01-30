@@ -1,3 +1,3 @@
-{"date":"2026-01-29","tool":"ChatGPT","task":"Backend service logika megírása","decision":"Egyszerű trackService használata"}
-{"date":"2026-01-29","tool":"ChatGPT","task":"Egységtesztek generálása","decision":"Jest alapú tesztelés bevezetése"}
-{"date":"2026-01-29","tool":"ChatGPT","task":"Coverage riport értelmezése","decision":"Automatikus mérés használata"}
+{"date":"2026-01-29","tool":"ChatGPT","task":"Backend service logika megírása","decision":"Egyszerű service réteg használata"}
+{"date":"2026-01-29","tool":"ChatGPT","task":"Egységtesztek kialakítása","decision":"Jest alapú tesztelés bevezetése"}
+{"date":"2026-01-30","tool":"ChatGPT","task":"JWT autentikáció","decision":"Middleware alapú védelem"}
