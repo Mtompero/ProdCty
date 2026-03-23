@@ -1,22 +1,22 @@
-# 0001: Technológiai stack választás
+# 0001: Technológiai stack kiválasztása
 
-- Dátum: 2025-10-15
+- Dátum: 2026-03-16
 - Státusz: Elfogadva
 
 ## Kontextus
-Gyors MVP fejlesztéshez és iterációhoz moduláris frontend és rugalmas backend kell, ami kezeli az audiófeltöltéseket és visszajelzéseket.
+Az első leadható verzióhoz működő, böngészőből használható MVP szükséges egy audiofókuszú közösségi platformhoz. A megvalósításnak támogatnia kell a hitelesítést, a track metaadatokat, az audiófeltöltést, a lejátszást, a kommenteket, valamint a későbbi szakdolgozati bővítést is.
 
 ## Döntés
-- Frontend: Angular + TypeScript  
-- Backend: Node.js (Express)  
-- Adatbázis: MongoDB  
+- Frontend: natív HTML, CSS és JavaScript egy könnyű MVP-hez
+- Backend: Node.js Express keretrendszerrel
+- Adatbázis: MongoDB
 
-## Alternatívák
-- React + TS + MongoDB – gyors prototípus, de Angular jobban támogatja a moduláris UI-t  
-- Vue 3 + Vite + Firebase – egyszerű setup, de kevés gyakorlat a csapatnak  
-- Django + Angular – erős admin, de bonyolultabb deployment
+## Vizsgált alternatívák
+- Angular + TypeScript: jól strukturált, de a jelenlegi MVP-scope-hoz túl nehéz
+- React + Vite: jó fejlesztői élmény, de a jelenlegi prototípusfázisban feleslegesen növeli a komplexitást
+- Django szerveroldali sablonokkal: erős backend eszköztár, de gyengébben illeszkedik a mostani JavaScript-alapú kódbázishoz
 
 ## Következmények
-- Stack jól skálázható, támogatja audiófeltöltést és közösségi funkciókat  
-- Gyors iteráció és rövid onboarding a csapatnak  
-- Adatmodell rugalmasan bővíthető MI-funkciókhoz
+- Gyors iterációs sebesség és alacsony induló overhead
+- Jól elkülöníthető frontend UI, backend API és MongoDB adatmodell
+- A stack könnyen dokumentálható és később is bővíthető, ha összetettebb kliensarchitektúrára lesz szükség

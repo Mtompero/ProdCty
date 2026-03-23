@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ProdCty | Creator</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body data-page="profile-view">
+  <header class="site-header">
+    <div class="brand">
+      <span class="dot"></span>
+      <div>
+        <div class="brand-name">ProdCty</div>
+        <div class="brand-sub">creator view</div>
+      </div>
+    </div>
+    <nav class="main-nav">
+      <a href="./index.html" data-nav="library">Library</a>
+      <a href="./social.html" data-nav="social">Community</a>
+      <a href="./demos.html" data-nav="demos">Demos</a>
+    </nav>
+    <div class="header-actions">
+      <span id="loginStatus" class="status-pill">Not logged in</span>
+      <a href="./auth.html" id="authLink" class="btn ghost">Login</a>
+      <a href="./profile.html" id="profileLink" class="profile-link" aria-label="Open profile">
+        <img id="headerAvatar" class="header-avatar" src="./assets/avatar-placeholder.svg" alt="Profile avatar" />
+      </a>
+      <button id="logoutBtn" class="btn small">Logout</button>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="hero compact">
+      <div class="profile-hero">
+        <div class="profile-avatar-wrap">
+          <img id="profileAvatar" class="profile-avatar" alt="Profile avatar" />
+          <div id="profileAvatarFallback" class="profile-avatar fallback">P</div>
+        </div>
+        <div class="profile-hero-copy">
+          <p class="eyebrow">Creator profile</p>
+          <h1 id="profileName">Loading profile...</h1>
+          <p id="profileBio" class="hero-copy">Artist bio and uploaded work appear here.</p>
+          <div id="profileMeta" class="meta-line"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel wide-profile-panel">
+      <div class="panel-header">
+        <h2>Samples</h2>
+        <p class="muted">Downloadable library uploads from this user.</p>
+      </div>
+      <div id="profileSamples" class="card-grid"></div>
+      <div id="profileSamplesEmpty" class="empty-state">No samples uploaded yet.</div>
+
+      <hr class="sep" />
+
+      <div class="panel-header">
+        <h2>Demos</h2>
+        <p class="muted">Work-in-progress uploads shared for feedback only.</p>
+      </div>
+      <div id="profileDemos" class="card-grid"></div>
+      <div id="profileDemosEmpty" class="empty-state">No demos uploaded yet.</div>
+    </section>
+  </main>
+
+  <div class="bottom-player">
+    <div class="bottom-player-meta">
+      <span class="eyebrow">Now playing</span>
+      <strong id="bottomPlayerTitle">No track selected yet</strong>
+      <span id="bottomPlayerInfo" class="muted">Pick a sample or demo to start playback.</span>
+    </div>
+    <audio id="bottomPlayerAudio" controls preload="none"></audio>
+  </div>
+
+  <script src="./shared.js"></script>
+  <script src="./profile-view.js"></script>
+</body>
+</html>

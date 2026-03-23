@@ -23,11 +23,80 @@ const trackSchema = new mongoose.Schema(
       trim: true,
       maxlength: 120
     },
-
+    kind: {
+      type: String,
+      enum: ["sample", "demo"],
+      default: "sample",
+      index: true
+    },
     genre: {
       type: String,
       default: "unknown",
       trim: true
+    },
+    description: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 500
+    },
+    bpm: {
+      type: Number,
+      default: null,
+      min: 1,
+      max: 400
+    },
+    musicalKey: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 16
+    },
+    licenseLabel: {
+      type: String,
+      default: "Royalty-free",
+      trim: true,
+      maxlength: 60
+    },
+    durationSec: {
+      type: Number,
+      default: null,
+      min: 1
+    },
+    originalFileName: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    mimeType: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    fileSize: {
+      type: Number,
+      required: true,
+      min: 1
+    },
+    audioUrl: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    storagePath: {
+      type: String,
+      required: true
+    },
+    ratingAverage: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
+    },
+    ratingCount: {
+      type: Number,
+      default: 0,
+      min: 0
     },
 
     createdAt: {
@@ -43,5 +112,6 @@ const trackSchema = new mongoose.Schema(
 
 trackSchema.index({ createdAt: -1 });
 trackSchema.index({ userId: 1, createdAt: -1 });
+trackSchema.index({ kind: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Track", trackSchema);
