@@ -3,85 +3,91 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ProdCty Demo</title>
+  <title>ProdCty | Library</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
-<body>
-  <header class="topbar">
+<body data-page="library">
+  <header class="site-header">
     <div class="brand">
       <span class="dot"></span>
-      <span class="name">ProdCty</span>
-      <span class="tag">demo</span>
+      <div>
+        <div class="brand-name">ProdCty</div>
+        <div class="brand-sub">audio community for producers</div>
+      </div>
     </div>
-    <div class="right">
-        <span id="loginStatus" class="status">Logged in</span>
-        <button id="logoutBtn" class="btn small">Logout</button>
+    <nav class="main-nav">
+      <a href="./index.html" data-nav="library">Library</a>
+      <a href="./social.html" data-nav="social">Community</a>
+      <a href="./demos.html" data-nav="demos">Demos</a>
+    </nav>
+    <div class="header-actions">
+      <span id="loginStatus" class="status-pill">Not logged in</span>
+      <a href="./auth.html" id="authLink" class="btn ghost">Login</a>
+      <a href="./profile.html" id="profileLink" class="profile-link" aria-label="Open profile">
+        <img id="headerAvatar" class="header-avatar" src="./assets/avatar-placeholder.svg" alt="Profile avatar" />
+      </a>
+      <button id="logoutBtn" class="btn small">Logout</button>
     </div>
   </header>
 
-  <main class="layout">
-    <section class="panel">
-      <h2>Create track (demo)</h2>
-      <p class="muted">This does not upload an audio file yet — only metadata for the demo.</p>
-
-      <form id="createForm" class="form">
-        
-        <label>
-          Title
-          <input name="title" placeholder="Lo-fi beat" required />
-        </label>
-
-        <label>
-          Genre
-          <input name="genre" placeholder="lofi" />
-        </label>
-
-        <button class="btn primary" type="submit">Create</button>
-        <div id="createMsg" class="msg"></div>
-      </form>
-
-      <hr class="sep" />
-
-      <h2>Comments</h2>
-      <p class="muted">Select a track from the feed to view/add comments.</p>
-
-        <form id="commentForm" class="form">
-        <div class="muted">
-            Selected track:
-            <strong id="selectedTrackTitle">None</strong>
-        </div>
-
-        <input type="hidden" id="commentTrackId" name="trackId" />
-
-        <label>
-            Text
-            <input name="text" placeholder="Nice beat!" required />
-        </label>
-
-        <button class="btn" type="submit">Add comment</button>
-        <div id="commentMsg" class="msg"></div>
-        </form>
-
-
-      <div class="comments">
-        <h3>Comment list</h3>
-        <div id="commentList" class="list muted">No track selected.</div>
+  <main class="page-shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Discover + play + download</p>
+        <h1>Browse a clean audio library built for producers.</h1>
+        <p class="hero-copy">Find loops, textures and sample ideas, then keep playback running in the bottom player while you move through the app.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-card"><span>Samples</span><strong id="sampleCount">0</strong></div>
+        <div class="stat-card"><span>Genres</span><strong id="genreCount">0</strong></div>
+        <div class="stat-card"><span>Flow</span><strong>Live</strong></div>
       </div>
     </section>
 
-    <section class="panel">
-      <div class="panel-head">
-        <h2>Feed</h2>
-        <button id="refreshBtn" class="btn">Refresh</button>
-      </div>
+    <section class="content-grid">
+      <aside class="panel">
+        <div class="panel-header">
+          <h2>Upload sample</h2>
+          <p class="muted">Drop in a loop or sample and publish it to the library.</p>
+        </div>
+        <form id="uploadForm" class="stack-form">
+          <input type="hidden" name="kind" value="sample" />
+          <label>Title<input name="title" placeholder="Dusty Vinyl Loop" required /></label>
+          <label>Genre<input name="genre" placeholder="lofi" /></label>
+          <label>BPM<input name="bpm" type="number" min="1" max="400" placeholder="86" /></label>
+          <label>Key<input name="musicalKey" placeholder="Am" /></label>
+          <label>Description<textarea name="description" rows="4" placeholder="Dusty tape loop, vinyl noise, warm bass texture."></textarea></label>
+          <label>Audio file<input id="audioFile" name="audioFile" type="file" accept="audio/*" required /></label>
+          <div id="audioFileMeta" class="muted small-copy">No audio file selected.</div>
+          <button class="btn primary" type="submit">Upload sample</button>
+          <div id="uploadMsg" class="msg"></div>
+        </form>
+      </aside>
 
-      <div id="feed" class="feed"></div>
-      <div id="feedEmpty" class="empty muted">No items yet. Create a track on the left.</div>
+      <section class="panel">
+        <div class="panel-header row-between">
+          <div>
+            <h2>Library</h2>
+            <p class="muted">All uploaded sounds are ready to preview and download.</p>
+          </div>
+          <button id="refreshBtn" class="btn subtle">Refresh</button>
+        </div>
+        <div id="sampleGrid" class="card-grid"></div>
+        <div id="emptyState" class="empty-state">No samples uploaded yet.</div>
+      </section>
     </section>
   </main>
 
+  <div class="bottom-player">
+    <div class="bottom-player-meta">
+      <span class="eyebrow">Now playing</span>
+      <strong id="bottomPlayerTitle">No track selected yet</strong>
+      <span id="bottomPlayerInfo" class="muted">Pick a sample or demo to start playback.</span>
+    </div>
+    <audio id="bottomPlayerAudio" controls preload="none"></audio>
+  </div>
 
-
-  <script src="./app.js"></script>
+  <script src="./shared.js"></script>
+  <script src="./library.js"></script>
 </body>
 </html>

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ProdCty | Demos</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body data-page="demos">
+  <header class="site-header">
+    <div class="brand">
+      <span class="dot"></span>
+      <div>
+        <div class="brand-name">ProdCty</div>
+        <div class="brand-sub">demo upload and peer rating</div>
+      </div>
+    </div>
+    <nav class="main-nav">
+      <a href="./index.html" data-nav="library">Library</a>
+      <a href="./social.html" data-nav="social">Community</a>
+      <a href="./demos.html" data-nav="demos">Demos</a>
+    </nav>
+    <div class="header-actions">
+      <span id="loginStatus" class="status-pill">Not logged in</span>
+      <a href="./auth.html" id="authLink" class="btn ghost">Login</a>
+      <a href="./profile.html" id="profileLink" class="profile-link" aria-label="Open profile">
+        <img id="headerAvatar" class="header-avatar" src="./assets/avatar-placeholder.svg" alt="Profile avatar" />
+      </a>
+      <button id="logoutBtn" class="btn small">Logout</button>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="hero compact">
+      <div>
+        <p class="eyebrow">Demo review</p>
+        <h1>A dedicated space for demos and ratings.</h1>
+        <p class="hero-copy">Upload works in progress, keep them playing in the bottom bar, and collect focused score-based feedback.</p>
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <aside class="panel">
+        <div class="panel-header">
+          <h2>Upload demo</h2>
+          <p class="muted">Demos live in a separate board and support score-based reviews.</p>
+        </div>
+        <form id="demoUploadForm" class="stack-form">
+          <input type="hidden" name="kind" value="demo" />
+          <label>Title<input name="title" placeholder="Summer Tape Demo" required /></label>
+          <label>Genre<input name="genre" placeholder="indie pop" /></label>
+          <label>BPM<input name="bpm" type="number" min="1" max="400" placeholder="124" /></label>
+          <label>Key<input name="musicalKey" placeholder="F#m" /></label>
+          <label>Description<textarea name="description" rows="4" placeholder="Pre-master demo, still shaping the chorus hook and low end."></textarea></label>
+          <label>Audio file<input id="demoAudioFile" name="audioFile" type="file" accept="audio/*" required /></label>
+          <div id="demoAudioMeta" class="muted small-copy">No demo file selected.</div>
+          <button class="btn primary" type="submit">Upload demo</button>
+          <div id="demoUploadMsg" class="msg"></div>
+        </form>
+      </aside>
+
+      <section class="panel">
+        <div class="panel-header row-between">
+          <div>
+            <h2>Demo board</h2>
+            <p class="muted">Select a demo, play it in the bottom bar, then rate it from 1 to 5.</p>
+          </div>
+          <button id="refreshBtn" class="btn">Refresh</button>
+        </div>
+        <div id="demoGrid" class="card-grid"></div>
+        <div id="demoEmpty" class="empty-state">No demos uploaded yet.</div>
+      </section>
+    </section>
+
+    <section class="content-grid narrow-top">
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Selected demo</h2>
+          <p id="selectedDemoMeta" class="muted">Choose a demo to review.</p>
+        </div>
+        <div class="selected-card">
+          <strong id="selectedDemoTitle">Nothing selected</strong>
+          <button id="playDemoBtn" class="btn primary" type="button">Play in bottom player</button>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-header">
+          <h2>Rating</h2>
+          <p class="muted">Each user can update their own score over time.</p>
+        </div>
+        <form id="ratingForm" class="stack-form">
+          <input type="hidden" id="ratingTrackId" name="trackId" />
+          <label>Score
+            <select name="score" required>
+              <option value="5">5 - outstanding</option>
+              <option value="4">4 - very strong</option>
+              <option value="3">3 - promising</option>
+              <option value="2">2 - needs work</option>
+              <option value="1">1 - early draft</option>
+            </select>
+          </label>
+          <label>Short review<textarea name="text" rows="4" placeholder="Great mood overall, but the top end could open up more."></textarea></label>
+          <button class="btn" type="submit">Save rating</button>
+          <div id="ratingMsg" class="msg"></div>
+        </form>
+        <div id="ratingSummary" class="summary-box">No demo selected yet.</div>
+        <div id="ratingList" class="comment-list">Ratings will appear here.</div>
+      </aside>
+    </section>
+  </main>
+
+  <div class="bottom-player">
+    <div class="bottom-player-meta">
+      <span class="eyebrow">Now playing</span>
+      <strong id="bottomPlayerTitle">No track selected yet</strong>
+      <span id="bottomPlayerInfo" class="muted">Start a demo from the board.</span>
+    </div>
+    <audio id="bottomPlayerAudio" controls preload="none"></audio>
+  </div>
+
+  <script src="./shared.js"></script>
+  <script src="./demos.js"></script>
+</body>
+</html>
