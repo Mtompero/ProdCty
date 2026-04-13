@@ -6,7 +6,7 @@
   <title>ProdCty | Login</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
-<body>
+<body class="auth-page">
   <header class="site-header">
     <div class="brand">
       <span class="dot"></span>
@@ -22,8 +22,8 @@
     </nav>
   </header>
 
-  <main class="page-shell">
-    <section class="hero compact">
+  <main class="page-shell auth-shell">
+    <section class="hero compact auth-hero">
       <div>
         <p class="eyebrow">Authentication</p>
         <h1>Create an account or sign in.</h1>
@@ -31,11 +31,10 @@
       </div>
     </section>
 
-    <section class="content-grid">
-      <section class="panel">
+    <section class="auth-grid">
+      <section class="panel auth-panel">
         <div class="panel-header">
           <h2>Register</h2>
-          <p id="apiStatus" class="muted"></p>
         </div>
         <form id="registerForm" class="stack-form">
           <label>Username<input name="username" required /></label>
@@ -47,7 +46,7 @@
         </form>
       </section>
 
-      <section class="panel">
+      <section class="panel auth-panel">
         <div class="panel-header">
           <h2>Login</h2>
           <p class="muted">After a successful login you will be sent back into the app.</p>

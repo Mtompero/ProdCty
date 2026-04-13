@@ -4,7 +4,6 @@ const registerForm = document.getElementById("registerForm");
 const registerMsg = document.getElementById("registerMsg");
 const loginForm = document.getElementById("loginForm");
 const loginMsg = document.getElementById("loginMsg");
-const apiStatus = document.getElementById("apiStatus");
 
 function setMsg(el, kind, text) {
   if (!el) return;
@@ -39,12 +38,7 @@ async function apiFetch(path, options = {}) {
 
 async function checkApiHealth() {
   const result = await apiFetch("/health");
-  if (!result.ok) {
-    setMsg(apiStatus, "err", "Backend offline on http://localhost:3000");
-    return;
-  }
-
-  setMsg(apiStatus, "ok", "Backend connected");
+  return result.ok;
 }
 
 registerForm.addEventListener("submit", async (event) => {
@@ -67,7 +61,6 @@ registerForm.addEventListener("submit", async (event) => {
 
   if (!result.ok) {
     setMsg(registerMsg, "err", "Backend is not reachable. Start the API server first.");
-    setMsg(apiStatus, "err", "Backend offline on http://localhost:3000");
     return;
   }
 
@@ -99,7 +92,6 @@ loginForm.addEventListener("submit", async (event) => {
 
   if (!result.ok) {
     setMsg(loginMsg, "err", "Backend is not reachable. Start the API server first.");
-    setMsg(apiStatus, "err", "Backend offline on http://localhost:3000");
     return;
   }
 

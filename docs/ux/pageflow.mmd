@@ -1,0 +1,33 @@
+flowchart TB
+    A["▶ S01 — Auth 🔒"]
+
+    subgraph MAIN["Main authenticated area"]
+        direction LR
+        B["S02 — Library"]
+        C["S03 — Community"]
+        D["S04 — Demos"]
+    end
+
+    E["S05 — Own Profile"]
+    F["S06 — Public Profile View"]
+
+    A -->|"Login / Register submit"| B
+
+    B <-->|"Top navigation"| C
+    C <-->|"Top navigation"| D
+    B <-->|"Top navigation"| D
+
+    B -->|"Profile icon"| E
+    C -->|"Profile icon"| E
+    D -->|"Profile icon"| E
+
+    B -->|"Uploader username link"| F
+    C -->|"Uploader username link"| F
+    D -->|"Uploader username link"| F
+    E -->|"User search result"| F
+    F -->|"Profile icon (own account)"| E
+
+    B -->|"Logout"| A
+    C -->|"Logout"| A
+    D -->|"Logout"| A
+    E -->|"Logout"| A
