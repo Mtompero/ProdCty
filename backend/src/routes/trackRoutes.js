@@ -11,14 +11,17 @@ const {
   getStoredAudioMeta,
   removeStoredFile,
 } = require("../utils/audioStorage");
+const { analyzeTrackMetadata } = require("../utils/analysis");
 const { jsonError } = require("../utils/http");
 const { trackDto, commentDto } = require("../utils/serializers");
 const {
   isNonEmptyString,
   normalizeGenre,
+  normalizeTags,
   normalizeTrackKind,
   parseDurationSec,
   parseOptionalNumber,
+  parseTimestampSec,
   sanitizeOptionalText,
   validateUploadedAudioFile,
   validateRatingScore,
@@ -39,10 +42,36 @@ function multerSingleAudio(req, res, next) {
 
 router.get("/feed", async (req, res) => {
   try {
-    const items = await Track.find({ kind: "sample" }).sort({ createdAt: -1 }).lean();
+    const items = await Track.find({ kind: "sample" }).sort({ createdAt: -1 }).limit(24).lean();
     return res.json(items.map(trackDto));
   } catch (err) {
     return jsonError(res, 500, "INTERNAL_ERROR", "Failed to load feed.");
+  }
+});
+
+router.get("/feed/for-you", async (req, res) => {
+  try {
+    const interests = normalizeTags(req.query.interests || "");
+    const query = { kind: "sample" };
+    const items = await Track.find(query).sort({ createdAt: -1 }).limit(60).lean();
+
+    const scored = items
+      .map((track) => {
+        let score = Number(track.playCount || 0) + Number(track.ratingCount || 0) * 3;
+        const trackTokens = new Set(normalizeTags([track.genre, ...(track.tags || []), track.energyLevel, track.musicalKey]));
+        interests.forEach((interest) => {
+          if (trackTokens.has(interest)) score += 8;
+        });
+        if (track.energyLevel === "high") score += 1;
+        return { track, score };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 18)
+      .map((item) => trackDto(item.track));
+
+    return res.json(scored);
+  } catch (err) {
+    return jsonError(res, 500, "INTERNAL_ERROR", "Failed to load the For You feed.");
   }
 });
 
@@ -50,6 +79,13 @@ router.get("/tracks", async (req, res) => {
   try {
     const userId = req.query.userId ? String(req.query.userId) : null;
     const kind = req.query.kind ? normalizeTrackKind(req.query.kind) : null;
+    const q = String(req.query.q || "").trim().toLowerCase();
+    const genre = req.query.genre ? normalizeGenre(req.query.genre) : null;
+    const musicalKey = sanitizeOptionalText(req.query.key || "", 16);
+    const energyLevel = sanitizeOptionalText(req.query.energy || "", 16).toLowerCase();
+    const bpmMin = parseOptionalNumber(req.query.bpmMin, 1, 400);
+    const bpmMax = parseOptionalNumber(req.query.bpmMax, 1, 400);
+    const tags = normalizeTags(req.query.tags || "");
     const query = {};
 
     if (userId) {
@@ -57,6 +93,31 @@ router.get("/tracks", async (req, res) => {
     }
     if (kind) {
       query.kind = kind;
+    }
+    if (genre) {
+      query.genre = genre;
+    }
+    if (musicalKey) {
+      query.musicalKey = musicalKey;
+    }
+    if (["low", "medium", "high"].includes(energyLevel)) {
+      query.energyLevel = energyLevel;
+    }
+    if (bpmMin || bpmMax) {
+      query.bpm = {};
+      if (bpmMin) query.bpm.$gte = bpmMin;
+      if (bpmMax) query.bpm.$lte = bpmMax;
+    }
+    if (tags.length) {
+      query.tags = { $in: tags };
+    }
+    if (q) {
+      query.$or = [
+        { title: { $regex: q, $options: "i" } },
+        { username: { $regex: q, $options: "i" } },
+        { description: { $regex: q, $options: "i" } },
+        { tags: { $in: [q] } },
+      ];
     }
 
     const items = await Track.find(query).sort({ createdAt: -1 }).lean();
@@ -81,6 +142,7 @@ router.get("/tracks/:id", async (req, res) => {
     if (!track) {
       return jsonError(res, 404, "TRACK_NOT_FOUND", "Track not found.");
     }
+    await Track.findByIdAndUpdate(track._id, { $inc: { playCount: 1 } }).catch(() => null);
     return res.json(trackDto(track));
   } catch (err) {
     return jsonError(res, 500, "INTERNAL_ERROR", "Failed to load track.");
@@ -138,6 +200,16 @@ router.post("/tracks", requireAuth, multerSingleAudio, async (req, res) => {
     }
 
     const storedAudio = getStoredAudioMeta(req.file);
+    const analysis = analyzeTrackMetadata({
+      title,
+      originalFileName: storedAudio.originalFileName,
+      genre,
+      bpm,
+      musicalKey,
+      durationSec,
+      kind,
+      username: req.user.username,
+    });
 
     const created = await Track.create({
       userId: req.user.id,
@@ -145,9 +217,12 @@ router.post("/tracks", requireAuth, multerSingleAudio, async (req, res) => {
       title: title.trim(),
       kind,
       genre,
+      tags: normalizeTags(req.body ? req.body.tags : "").length ? normalizeTags(req.body.tags) : analysis.tags,
       description,
-      bpm,
-      musicalKey,
+      bpm: bpm || analysis.bpm,
+      musicalKey: musicalKey || analysis.musicalKey,
+      energyLevel: analysis.energyLevel,
+      analysisSource: analysis.analysisSource,
       licenseLabel: "Royalty-free",
       durationSec,
       originalFileName: storedAudio.originalFileName,
@@ -215,6 +290,7 @@ router.post("/tracks/:trackId/comments", requireAuth, async (req, res) => {
   try {
     const trackId = String(req.params.trackId);
     const text = req.body && req.body.text ? String(req.body.text) : "";
+    const category = sanitizeOptionalText(req.body ? req.body.category : "", 32).toLowerCase() || "general";
 
     const track = await Track.findById(trackId).lean().catch(() => null);
     if (!track) {
@@ -227,11 +303,14 @@ router.post("/tracks/:trackId/comments", requireAuth, async (req, res) => {
     if (text.length > 500) {
       return jsonError(res, 400, "VALIDATION_ERROR", "text is too long (max 500).");
     }
+    const timestampSec = parseTimestampSec(req.body ? req.body.timestampSec : null, track.durationSec);
 
     const created = await Comment.create({
       trackId,
       userId: req.user.id,
       author: req.user.username,
+      category: ["arrangement", "mix", "sound-design", "performance", "general"].includes(category) ? category : "general",
+      timestampSec,
       text: text.trim(),
       createdAt: new Date(),
     });

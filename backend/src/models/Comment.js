@@ -5,6 +5,13 @@ const commentSchema = new mongoose.Schema(
     trackId: { type: mongoose.Schema.Types.ObjectId, required: true, index: true },
     userId: { type: mongoose.Schema.Types.ObjectId, required: false, index: true },
     author: { type: String, trim: true, default: "anonymous", maxlength: 40 },
+    category: {
+      type: String,
+      enum: ["arrangement", "mix", "sound-design", "performance", "general"],
+      default: "general",
+      index: true,
+    },
+    timestampSec: { type: Number, default: null, min: 0 },
     text: { type: String, required: true, trim: true, maxlength: 500 },
     createdAt: { type: Date, default: Date.now, index: true },
   },

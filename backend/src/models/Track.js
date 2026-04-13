@@ -34,6 +34,11 @@ const trackSchema = new mongoose.Schema(
       default: "unknown",
       trim: true
     },
+    tags: {
+      type: [String],
+      default: [],
+      index: true,
+    },
     description: {
       type: String,
       default: "",
@@ -51,6 +56,18 @@ const trackSchema = new mongoose.Schema(
       default: "",
       trim: true,
       maxlength: 16
+    },
+    energyLevel: {
+      type: String,
+      enum: ["low", "medium", "high"],
+      default: "medium",
+      index: true,
+    },
+    analysisSource: {
+      type: String,
+      default: "manual",
+      trim: true,
+      maxlength: 60,
     },
     licenseLabel: {
       type: String,
@@ -98,6 +115,11 @@ const trackSchema = new mongoose.Schema(
       default: 0,
       min: 0
     },
+    playCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
 
     createdAt: {
       type: Date,
@@ -113,5 +135,6 @@ const trackSchema = new mongoose.Schema(
 trackSchema.index({ createdAt: -1 });
 trackSchema.index({ userId: 1, createdAt: -1 });
 trackSchema.index({ kind: 1, createdAt: -1 });
+trackSchema.index({ kind: 1, genre: 1, bpm: 1, musicalKey: 1, energyLevel: 1 });
 
 module.exports = mongoose.model("Track", trackSchema);

@@ -1,5 +1,10 @@
 const API = "http://localhost:3000";
 const PLAYER_KEY = "prodcty_now_playing";
+let bottomAudioTimeHandler = null;
+let bottomAudioLoadedHandler = null;
+let bottomAudioPlayHandler = null;
+let bottomAudioPauseHandler = null;
+let activePlayerTrackId = "";
 
 function getToken() {
   return localStorage.getItem("prodcty_token") || "";
@@ -84,6 +89,14 @@ function formatRating(value, count) {
   return `${rating.toFixed(1)}/5 (${ratingCount})`;
 }
 
+function formatTimestamp(seconds) {
+  const value = Math.round(Number(seconds));
+  if (!Number.isFinite(value) || value < 0) return "--:--";
+  const mins = Math.floor(value / 60);
+  const secs = Math.floor(value % 60);
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+}
+
 async function apiFetch(path, options = {}) {
   try {
     const response = await fetch(`${API}${path}`, options);
@@ -140,31 +153,117 @@ function getSavedPlayerTrack() {
   }
 }
 
-function mountBottomPlayer() {
+function notifyPlayerState(audioEl, trackId) {
+  window.dispatchEvent(new CustomEvent("prodcty:player-state", {
+    detail: {
+      trackId: trackId || activePlayerTrackId || "",
+      isPlaying: Boolean(audioEl && !audioEl.paused && !audioEl.ended),
+      currentTime: audioEl ? Number(audioEl.currentTime || 0) : 0,
+    },
+  }));
+}
+
+function loadAudioSource(audioEl, src) {
+  return new Promise((resolve) => {
+    if (!audioEl) {
+      resolve();
+      return;
+    }
+
+    const done = () => {
+      audioEl.removeEventListener("loadedmetadata", done);
+      audioEl.removeEventListener("canplay", done);
+      resolve();
+    };
+
+    audioEl.pause();
+    audioEl.removeAttribute("src");
+    audioEl.load();
+    audioEl.currentTime = 0;
+    audioEl.addEventListener("loadedmetadata", done, { once: true });
+    audioEl.addEventListener("canplay", done, { once: true });
+    audioEl.src = src;
+    audioEl.load();
+  });
+}
+
+async function mountBottomPlayer() {
   const titleEl = document.getElementById("bottomPlayerTitle");
   const infoEl = document.getElementById("bottomPlayerInfo");
   const audioEl = document.getElementById("bottomPlayerAudio");
+  const timeEl = document.getElementById("bottomPlayerTime");
   const saved = getSavedPlayerTrack();
 
   if (!titleEl || !infoEl || !audioEl || !saved || !saved.audioUrl) return;
 
+  activePlayerTrackId = saved.id || "";
   titleEl.textContent = saved.title || "Unknown track";
-  infoEl.textContent = `${saved.username || "Unknown"} | ${saved.genre || "unknown"} | ${formatDuration(saved.durationSec)}`;
-  audioEl.src = `${API}${saved.audioUrl}`;
+  infoEl.textContent = `${saved.username || "Unknown"} | ${saved.genre || "unknown"} | ${saved.musicalKey || "-"} | ${saved.energyLevel || "medium"} energy`;
+  await loadAudioSource(audioEl, buildMediaUrl(saved.audioUrl));
+  if (timeEl) {
+    timeEl.textContent = `00:00 / ${formatDuration(saved.durationSec)}`;
+  }
+  bindBottomPlayerTime(audioEl);
 }
 
-function playTrack(track) {
+async function playTrack(track) {
   const titleEl = document.getElementById("bottomPlayerTitle");
   const infoEl = document.getElementById("bottomPlayerInfo");
   const audioEl = document.getElementById("bottomPlayerAudio");
+  const timeEl = document.getElementById("bottomPlayerTime");
 
   if (!titleEl || !infoEl || !audioEl || !track || !track.audioUrl) return;
 
   savePlayerTrack(track);
+  activePlayerTrackId = track.id || "";
   titleEl.textContent = track.title || "Unknown track";
-  infoEl.textContent = `${track.username || "Unknown"} | ${track.genre || "unknown"} | ${formatDuration(track.durationSec)} | ${formatFileSize(track.fileSize)}`;
-  audioEl.src = `${API}${track.audioUrl}`;
+  infoEl.textContent = `${track.username || "Unknown"} | ${track.genre || "unknown"} | ${track.musicalKey || "-"} | ${track.energyLevel || "medium"} energy | ${formatFileSize(track.fileSize)}`;
+  await loadAudioSource(audioEl, buildMediaUrl(track.audioUrl));
+  if (timeEl) {
+    timeEl.textContent = `00:00 / ${formatDuration(track.durationSec)}`;
+  }
+  bindBottomPlayerTime(audioEl);
   audioEl.play().catch(() => {});
+}
+
+function bindBottomPlayerTime(audioEl) {
+  if (!audioEl) return;
+  if (bottomAudioTimeHandler) {
+    audioEl.removeEventListener("timeupdate", bottomAudioTimeHandler);
+  }
+  if (bottomAudioLoadedHandler) {
+    audioEl.removeEventListener("loadedmetadata", bottomAudioLoadedHandler);
+  }
+  if (bottomAudioPlayHandler) {
+    audioEl.removeEventListener("play", bottomAudioPlayHandler);
+    audioEl.removeEventListener("playing", bottomAudioPlayHandler);
+  }
+  if (bottomAudioPauseHandler) {
+    audioEl.removeEventListener("pause", bottomAudioPauseHandler);
+    audioEl.removeEventListener("ended", bottomAudioPauseHandler);
+  }
+
+  const timeEl = document.getElementById("bottomPlayerTime");
+  const updateTime = () => {
+    if (!timeEl) return;
+    timeEl.textContent = `${formatTimestamp(audioEl.currentTime)} / ${formatDuration(audioEl.duration)}`;
+  };
+  bottomAudioTimeHandler = updateTime;
+  bottomAudioLoadedHandler = updateTime;
+  bottomAudioPlayHandler = () => notifyPlayerState(audioEl, activePlayerTrackId);
+  bottomAudioPauseHandler = () => notifyPlayerState(audioEl, activePlayerTrackId);
+  audioEl.addEventListener("timeupdate", bottomAudioTimeHandler);
+  audioEl.addEventListener("loadedmetadata", bottomAudioLoadedHandler);
+  audioEl.addEventListener("play", bottomAudioPlayHandler);
+  audioEl.addEventListener("playing", bottomAudioPlayHandler);
+  audioEl.addEventListener("pause", bottomAudioPauseHandler);
+  audioEl.addEventListener("ended", bottomAudioPauseHandler);
+  notifyPlayerState(audioEl, activePlayerTrackId);
+}
+
+function getCurrentPlayerTime() {
+  const audioEl = document.getElementById("bottomPlayerAudio");
+  return audioEl ? Number(audioEl.currentTime || 0) : 0;
 }
 
 function initShell() {
@@ -212,7 +311,11 @@ function initShell() {
   }
 
   if (loggedIn && headerAvatar) {
-    apiFetch("/me").then((result) => {
+    apiFetch("/me", {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    }).then((result) => {
       const user = result.ok && result.response && result.response.ok && result.data ? result.data.user : null;
       refreshHeaderAvatar(user && user.avatarUrl ? user.avatarUrl : "");
     });

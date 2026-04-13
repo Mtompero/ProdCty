@@ -13,6 +13,7 @@ const {
 const { jsonError } = require("../utils/http");
 const {
   isNonEmptyString,
+  normalizeInterests,
   sanitizeOptionalText,
   validateUploadedImageFile,
 } = require("../utils/validators");
@@ -40,6 +41,21 @@ function userDto(user) {
     bio: user.bio || "",
     avatarUrl: user.avatarUrl || null,
     createdAt: user.createdAt,
+  };
+}
+
+function buildProfileStats(tracks) {
+  const samples = tracks.filter((track) => track.kind === "sample");
+  const demos = tracks.filter((track) => track.kind === "demo");
+  const totalPlays = tracks.reduce((sum, track) => sum + Number(track.playCount || 0), 0);
+  const totalRatings = demos.reduce((sum, track) => sum + Number(track.ratingCount || 0), 0);
+
+  return {
+    totalUploads: tracks.length,
+    sampleCount: samples.length,
+    demoCount: demos.length,
+    totalPlays,
+    totalRatings,
   };
 }
 
@@ -79,6 +95,7 @@ router.get("/users/:id", async (req, res) => {
       user: userDto(user),
       samples: tracks.filter((track) => track.kind === "sample").map(trackDto),
       demos: tracks.filter((track) => track.kind === "demo").map(trackDto),
+      stats: buildProfileStats(tracks),
     });
   } catch (err) {
     return jsonError(res, 500, "INTERNAL_ERROR", "Failed to load profile.");
@@ -101,8 +118,8 @@ router.get("/me", requireAuth, async (req, res) => {
 router.patch("/me", requireAuth, async (req, res) => {
   try {
     const bio = sanitizeOptionalText(req.body ? req.body.bio : "", 240);
-    const interests = Array.isArray(req.body && req.body.interests)
-      ? req.body.interests.map((item) => String(item).trim()).filter(Boolean)
+    const interests = req.body && req.body.interests !== undefined
+      ? normalizeInterests(req.body.interests)
       : undefined;
 
     const user = await User.findById(req.user.id);

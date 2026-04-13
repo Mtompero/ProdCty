@@ -17,6 +17,9 @@ function trackDto(track) {
     description: track.description || "",
     bpm: track.bpm || null,
     musicalKey: track.musicalKey || "",
+    energyLevel: track.energyLevel || "medium",
+    tags: Array.isArray(track.tags) ? track.tags : [],
+    analysisSource: track.analysisSource || "manual",
     licenseLabel: track.licenseLabel || "Royalty-free",
     durationSec: track.durationSec || null,
     originalFileName: track.originalFileName || null,
@@ -27,6 +30,7 @@ function trackDto(track) {
     isDownloadable: track.kind === "sample",
     ratingAverage: Number(track.ratingAverage || 0),
     ratingCount: Number(track.ratingCount || 0),
+    playCount: Number(track.playCount || 0),
     createdAt: track.createdAt,
   };
 }
@@ -36,6 +40,8 @@ function commentDto(comment) {
     id: comment._id?.toString ? comment._id.toString() : String(comment.id),
     trackId: comment.trackId?.toString ? comment.trackId.toString() : String(comment.trackId),
     author: comment.author,
+    category: comment.category || "general",
+    timestampSec: Number.isFinite(Number(comment.timestampSec)) ? Number(comment.timestampSec) : null,
     text: comment.text,
     createdAt: comment.createdAt,
   };
