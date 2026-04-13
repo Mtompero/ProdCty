@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="6" failures="0" errors="0" time="0.167">
-  <testsuite name="trackService" errors="0" failures="0" skipped="0" timestamp="2026-03-21T15:14:59" time="0.139" tests="6">
+<testsuites name="jest tests" tests="6" failures="0" errors="0" time="0.407">
+  <testsuite name="trackService" errors="0" failures="0" skipped="0" timestamp="2026-04-09T11:19:09" time="0.331" tests="6">
     <testcase classname="trackService valid track passes validation" name="trackService valid track passes validation" time="0.001">
     </testcase>
     <testcase classname="trackService track with empty title is invalid" name="trackService track with empty title is invalid" time="0">
@@ -9,7 +9,7 @@
     </testcase>
     <testcase classname="trackService addTrack adds a new track with id" name="trackService addTrack adds a new track with id" time="0.001">
     </testcase>
-    <testcase classname="trackService addTrack throws on invalid track" name="trackService addTrack throws on invalid track" time="0.005">
+    <testcase classname="trackService addTrack throws on invalid track" name="trackService addTrack throws on invalid track" time="0.004">
     </testcase>
     <testcase classname="trackService filterByGenre returns only matching tracks" name="trackService filterByGenre returns only matching tracks" time="0">
     </testcase>

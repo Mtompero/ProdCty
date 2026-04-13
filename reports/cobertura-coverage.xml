@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
-<coverage lines-valid="12" lines-covered="12" line-rate="1" branches-valid="14" branches-covered="11" branch-rate="0.7857" timestamp="1774106099463" complexity="0" version="0.1">
+<coverage lines-valid="12" lines-covered="12" line-rate="1" branches-valid="14" branches-covered="11" branch-rate="0.7857" timestamp="1775733549719" complexity="0" version="0.1">
   <sources>
     <source>F:\SZAKDOGA\1-sprint-Mtompero\backend</source>
   </sources>

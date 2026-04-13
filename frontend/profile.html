@@ -42,6 +42,7 @@
           <h1 id="profileName">Loading profile...</h1>
           <p id="profileBio" class="hero-copy">Artist bio and uploaded work appear here.</p>
           <div id="profileMeta" class="meta-line"></div>
+          <div id="profileStats" class="hero-stats profile-stats"></div>
         </div>
       </div>
     </section>
@@ -112,7 +113,10 @@
       <strong id="bottomPlayerTitle">No track selected yet</strong>
       <span id="bottomPlayerInfo" class="muted">Pick a sample or demo to start playback.</span>
     </div>
-    <audio id="bottomPlayerAudio" controls preload="none"></audio>
+    <div class="bottom-player-audio-shell">
+      <div id="bottomPlayerTime" class="bottom-player-time">00:00 / 00:00</div>
+      <audio id="bottomPlayerAudio" controls preload="none"></audio>
+    </div>
   </div>
 
   <script src="./shared.js"></script>

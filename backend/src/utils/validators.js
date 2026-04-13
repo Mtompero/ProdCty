@@ -22,8 +22,13 @@ function normalizeInterests(value) {
 }
 
 function normalizeGenre(value) {
-  const genre = String(value || "").trim();
+  const genre = String(value || "").trim().toLowerCase();
   return genre || "unknown";
+}
+
+function normalizeTags(value) {
+  const items = Array.isArray(value) ? value : String(value || "").split(",");
+  return [...new Set(items.map((item) => String(item).trim().toLowerCase()).filter(Boolean))].slice(0, 20);
 }
 
 function normalizeTrackKind(value) {
@@ -65,6 +70,21 @@ function parseDurationSec(value) {
   }
 
   return Math.round(parsed);
+}
+
+function parseTimestampSec(value, durationSec) {
+  if (value === undefined || value === null || value === "") {
+    return null;
+  }
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return null;
+  }
+  const max = Number(durationSec || 0);
+  if (max > 0 && parsed > max) {
+    return max;
+  }
+  return Math.round(parsed * 10) / 10;
 }
 
 function validateUploadedAudioFile(file) {
@@ -109,10 +129,12 @@ module.exports = {
   isValidEmail,
   normalizeInterests,
   normalizeGenre,
+  normalizeTags,
   normalizeTrackKind,
   parseOptionalNumber,
   sanitizeOptionalText,
   parseDurationSec,
+  parseTimestampSec,
   validateUploadedAudioFile,
   validateUploadedImageFile,
   validateRatingScore,

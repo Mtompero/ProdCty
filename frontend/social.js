@@ -9,9 +9,12 @@ const socialEls = {
   commentTrackId: document.getElementById("commentTrackId"),
   commentMsg: document.getElementById("commentMsg"),
   commentList: document.getElementById("commentList"),
+  forYouBtn: document.getElementById("forYouBtn"),
+  latestBtn: document.getElementById("latestBtn"),
 };
 
 let selectedTrack = null;
+let currentFeedMode = "for-you";
 
 function socialCard(track) {
   return `
@@ -32,8 +35,19 @@ function socialCard(track) {
   `;
 }
 
-async function loadFeed() {
-  const result = await apiFetch("/tracks?kind=sample");
+async function loadFeed(mode = currentFeedMode) {
+  currentFeedMode = mode;
+  socialEls.forYouBtn.classList.toggle("active", mode === "for-you");
+  socialEls.latestBtn.classList.toggle("active", mode === "latest");
+
+  const meResult = getToken() ? await apiFetch("/me", { headers: { Authorization: `Bearer ${getToken()}` } }) : null;
+  const interests = meResult && meResult.ok && meResult.response.ok && meResult.data && meResult.data.user
+    ? (meResult.data.user.interests || []).join(",")
+    : "";
+  const endpoint = mode === "for-you"
+    ? `/feed/for-you?interests=${encodeURIComponent(interests)}`
+    : "/tracks?kind=sample";
+  const result = await apiFetch(endpoint);
   if (!result.ok) {
     socialEls.feed.innerHTML = "";
     socialEls.empty.style.display = "block";
@@ -140,6 +154,8 @@ socialEls.commentForm.addEventListener("submit", async (event) => {
 });
 
 socialEls.refreshBtn.addEventListener("click", loadFeed);
+socialEls.forYouBtn.addEventListener("click", () => loadFeed("for-you"));
+socialEls.latestBtn.addEventListener("click", () => loadFeed("latest"));
 
 initShell();
-loadFeed();
+loadFeed("for-you");

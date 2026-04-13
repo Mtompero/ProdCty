@@ -2,6 +2,7 @@ const profileViewEls = {
   profileName: document.getElementById("profileName"),
   profileBio: document.getElementById("profileBio"),
   profileMeta: document.getElementById("profileMeta"),
+  profileStats: document.getElementById("profileStats"),
   profileAvatar: document.getElementById("profileAvatar"),
   profileAvatarFallback: document.getElementById("profileAvatarFallback"),
   samples: document.getElementById("profileSamples"),
@@ -25,12 +26,21 @@ function trackCard(track) {
       <div class="card-chip">${escapeHtml(track.kind === "demo" ? "Demo" : track.genre || "sample")}</div>
       <h3>${escapeHtml(track.title)}</h3>
       <p class="muted">${escapeHtml(track.description || "No description yet.")}</p>
-      <div class="meta-line">${escapeHtml(formatDuration(track.durationSec))} | ${escapeHtml(formatFileSize(track.fileSize))}</div>
+      <div class="meta-line">${escapeHtml(formatDuration(track.durationSec))} | ${escapeHtml(formatFileSize(track.fileSize))} | ${escapeHtml(track.bpm ? `${track.bpm} BPM` : "no BPM")} | ${escapeHtml(track.energyLevel || "medium")} energy</div>
       <div class="card-actions">
         <button class="btn primary" data-play="${escapeHtml(track.id)}">Play</button>
         ${secondaryAction}
       </div>
     </article>
+  `;
+}
+
+function renderProfileStats(stats) {
+  if (!profileViewEls.profileStats) return;
+  profileViewEls.profileStats.innerHTML = `
+    <div class="stat-card"><span>Uploads</span><strong>${escapeHtml(stats.totalUploads || 0)}</strong></div>
+    <div class="stat-card"><span>Plays</span><strong>${escapeHtml(stats.totalPlays || 0)}</strong></div>
+    <div class="stat-card"><span>Reviews</span><strong>${escapeHtml(stats.totalRatings || 0)}</strong></div>
   `;
 }
 
@@ -74,6 +84,7 @@ async function loadProfile(userId) {
   }
 
   renderProfileUser(result.data.user);
+  renderProfileStats(result.data.stats || {});
   renderTrackSection(result.data.samples || [], profileViewEls.samples, profileViewEls.samplesEmpty);
   renderTrackSection(result.data.demos || [], profileViewEls.demos, profileViewEls.demosEmpty);
 }

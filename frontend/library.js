@@ -8,17 +8,38 @@ const libraryEls = {
   refreshBtn: document.getElementById("refreshBtn"),
   sampleCount: document.getElementById("sampleCount"),
   genreCount: document.getElementById("genreCount"),
+  analysisCount: document.getElementById("analysisCount"),
+  filterForm: document.getElementById("filterForm"),
+  clearFiltersBtn: document.getElementById("clearFiltersBtn"),
 };
+
+function renderPreviewBars(track) {
+  const duration = Number(track.durationSec || 0);
+  const count = 28;
+
+  return Array.from({ length: count }, (_, index) => {
+    const waveSeed = ((index * 7) + duration * 3) % 11;
+    const height = 10 + waveSeed * 2;
+    return `<span style="height:${height}px; --bar-height:${height}px; --bar-delay:${(index % 8) * 0.08}s"></span>`;
+  }).join("");
+}
 
 function sampleCard(track) {
   return `
-    <article class="library-card">
-      <div class="card-chip">${escapeHtml(track.genre || "unknown")}</div>
-      <h3>${escapeHtml(track.title)}</h3>
-      <p class="muted">${escapeHtml(track.description || "No description yet.")}</p>
-      <div class="meta-line">${renderUserLink(track.userId, track.username)} | ${escapeHtml(track.musicalKey || "-")}</div>
-      <div class="meta-line">${escapeHtml(formatDuration(track.durationSec))} | ${escapeHtml(formatFileSize(track.fileSize))} | ${escapeHtml(track.bpm ? `${track.bpm} BPM` : "no BPM")}</div>
-      <div class="card-actions">
+    <article class="library-row" data-track-id="${escapeHtml(track.id)}">
+      <div class="library-row-main">
+        <div class="library-row-art">${escapeHtml((track.genre || "fx").slice(0, 2).toUpperCase())}</div>
+        <div class="library-row-copy">
+          <h3>${escapeHtml(track.title)}</h3>
+          <div class="meta-line">${renderUserLink(track.userId, track.username)} | ${escapeHtml(track.genre || "unknown")} | ${escapeHtml(formatFileSize(track.fileSize))}</div>
+          <div class="library-row-tags">${(track.tags || []).slice(0, 4).map((tag) => `<span class="tag-pill">${escapeHtml(tag)}</span>`).join("")}</div>
+        </div>
+      </div>
+      <div class="library-row-preview" aria-hidden="true">${renderPreviewBars(track)}</div>
+      <div class="library-row-stat">${escapeHtml(formatDuration(track.durationSec))}</div>
+      <div class="library-row-stat">${escapeHtml(track.musicalKey || "--")}</div>
+      <div class="library-row-stat">${escapeHtml(track.bpm ? `${track.bpm}` : "--")}</div>
+      <div class="library-row-actions">
         <button class="btn primary" data-play="${escapeHtml(track.id)}">Play</button>
         <a class="btn ghost" href="${API}${escapeHtml(track.downloadUrl || "")}">Download</a>
       </div>
@@ -26,8 +47,33 @@ function sampleCard(track) {
   `;
 }
 
+function updateActivePreview(trackId, isPlaying) {
+  document.querySelectorAll(".library-row.is-playing").forEach((row) => {
+    row.classList.remove("is-playing");
+  });
+
+  if (!trackId || !isPlaying) return;
+
+  const activeRow = libraryEls.sampleGrid.querySelector(`.library-row[data-track-id="${CSS.escape(trackId)}"]`);
+  if (activeRow) {
+    activeRow.classList.add("is-playing");
+  }
+}
+
+function buildTrackQuery(form) {
+  const params = new URLSearchParams({ kind: "sample" });
+  const formData = new FormData(form);
+  for (const [key, value] of formData.entries()) {
+    if (String(value || "").trim()) {
+      params.set(key, String(value).trim());
+    }
+  }
+  return params.toString();
+}
+
 async function loadSamples() {
-  const result = await apiFetch("/tracks?kind=sample");
+  const query = libraryEls.filterForm ? buildTrackQuery(libraryEls.filterForm) : "kind=sample";
+  const result = await apiFetch(`/tracks?${query}`);
   if (!result.ok) {
     libraryEls.sampleGrid.innerHTML = "";
     libraryEls.emptyState.style.display = "block";
@@ -40,6 +86,7 @@ async function loadSamples() {
   libraryEls.emptyState.style.display = items.length ? "none" : "block";
   libraryEls.sampleCount.textContent = String(items.length);
   libraryEls.genreCount.textContent = String(new Set(items.map((item) => item.genre || "unknown")).size);
+  libraryEls.analysisCount.textContent = String(items.filter((item) => item.analysisSource && item.analysisSource !== "manual").length);
   return items;
 }
 
@@ -104,6 +151,19 @@ libraryEls.uploadForm.addEventListener("submit", async (event) => {
 });
 
 libraryEls.refreshBtn.addEventListener("click", loadSamples);
+libraryEls.filterForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  loadSamples();
+});
+libraryEls.clearFiltersBtn.addEventListener("click", () => {
+  libraryEls.filterForm.reset();
+  loadSamples();
+});
 
 initShell();
 loadSamples();
+
+window.addEventListener("prodcty:player-state", (event) => {
+  const detail = event.detail || {};
+  updateActivePreview(detail.trackId || "", Boolean(detail.isPlaying));
+});
