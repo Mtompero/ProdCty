@@ -1,17 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="6" failures="0" errors="0" time="0.407">
-  <testsuite name="trackService" errors="0" failures="0" skipped="0" timestamp="2026-04-09T11:19:09" time="0.331" tests="6">
-    <testcase classname="trackService valid track passes validation" name="trackService valid track passes validation" time="0.001">
+<testsuites name="jest tests" tests="19" failures="0" errors="0" time="0.741">
+  <testsuite name="app routes" errors="0" failures="0" skipped="0" timestamp="2026-04-26T21:08:41" time="0.622" tests="9">
+    <testcase classname="app routes public user search omits email addresses" name="app routes public user search omits email addresses" time="0.013">
+    </testcase>
+    <testcase classname="app routes current user endpoint still returns private email data" name="app routes current user endpoint still returns private email data" time="0.005">
+    </testcase>
+    <testcase classname="app routes track detail no longer increments play count" name="app routes track detail no longer increments play count" time="0.003">
+    </testcase>
+    <testcase classname="app routes play endpoint increments play count explicitly" name="app routes play endpoint increments play count explicitly" time="0.003">
+    </testcase>
+    <testcase classname="app routes register enforces stronger password validation" name="app routes register enforces stronger password validation" time="0.009">
+    </testcase>
+    <testcase classname="app routes demos endpoint returns paginated payload" name="app routes demos endpoint returns paginated payload" time="0.003">
+    </testcase>
+    <testcase classname="app routes admin overview rejects a non-admin token" name="app routes admin overview rejects a non-admin token" time="0.003">
+    </testcase>
+    <testcase classname="app routes admin overview returns moderation statistics for admins" name="app routes admin overview returns moderation statistics for admins" time="0.003">
+    </testcase>
+    <testcase classname="app routes second admin warning automatically bans the user" name="app routes second admin warning automatically bans the user" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="trackService" errors="0" failures="0" skipped="0" timestamp="2026-04-26T21:08:42" time="0.037" tests="6">
+    <testcase classname="trackService valid track passes validation" name="trackService valid track passes validation" time="0">
     </testcase>
     <testcase classname="trackService track with empty title is invalid" name="trackService track with empty title is invalid" time="0">
     </testcase>
-    <testcase classname="trackService track with non-positive length is invalid" name="trackService track with non-positive length is invalid" time="0">
+    <testcase classname="trackService track with non-positive length is invalid" name="trackService track with non-positive length is invalid" time="0.001">
     </testcase>
-    <testcase classname="trackService addTrack adds a new track with id" name="trackService addTrack adds a new track with id" time="0.001">
+    <testcase classname="trackService addTrack adds a new track with id" name="trackService addTrack adds a new track with id" time="0">
     </testcase>
     <testcase classname="trackService addTrack throws on invalid track" name="trackService addTrack throws on invalid track" time="0.004">
     </testcase>
     <testcase classname="trackService filterByGenre returns only matching tracks" name="trackService filterByGenre returns only matching tracks" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="audio aura generation" errors="0" failures="0" skipped="0" timestamp="2026-04-26T21:08:42" time="0.027" tests="4">
+    <testcase classname="audio aura generation metal demos with high energy produce an intense aura" name="audio aura generation metal demos with high energy produce an intense aura" time="0.001">
+    </testcase>
+    <testcase classname="audio aura generation same genre demos still get different aura palettes" name="audio aura generation same genre demos still get different aura palettes" time="0.001">
+    </testcase>
+    <testcase classname="audio aura generation metadata analysis does not guess bpm when it is not explicit" name="audio aura generation metadata analysis does not guess bpm when it is not explicit" time="0">
+    </testcase>
+    <testcase classname="audio aura generation metadata analysis keeps explicit bpm from the filename" name="audio aura generation metadata analysis keeps explicit bpm from the filename" time="0.001">
     </testcase>
   </testsuite>
 </testsuites>

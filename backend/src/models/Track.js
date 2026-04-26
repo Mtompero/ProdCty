@@ -15,6 +15,11 @@ const trackSchema = new mongoose.Schema(
       maxlength: 32,
       index: true,
     },
+    userAvatarUrl: {
+      type: String,
+      default: "",
+      trim: true,
+    },
 
 
     title: {
@@ -69,6 +74,17 @@ const trackSchema = new mongoose.Schema(
       trim: true,
       maxlength: 60,
     },
+    aura: {
+      primaryColor: { type: String, default: "#ff2d2d", trim: true },
+      secondaryColor: { type: String, default: "#241118", trim: true },
+      accentColor: { type: String, default: "#2dd4bf", trim: true },
+      gradient: {
+        type: String,
+        default: "linear-gradient(135deg, #ff2d2d, #241118 58%, #2dd4bf)",
+        trim: true,
+      },
+      moodLabel: { type: String, default: "Balanced unknown aura", trim: true, maxlength: 80 },
+    },
     licenseLabel: {
       type: String,
       default: "Royalty-free",
@@ -116,6 +132,16 @@ const trackSchema = new mongoose.Schema(
       min: 0
     },
     playCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    upvoteCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    downvoteCount: {
       type: Number,
       default: 0,
       min: 0,

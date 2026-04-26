@@ -33,6 +33,9 @@ module.exports = function requireAuth(req, res, next) {
       id: payload.sub,
       username: payload.username,
       email: payload.email,
+      avatarUrl: payload.avatarUrl || "",
+      role: payload.role || "user",
+      moderationStatus: payload.moderationStatus || "active",
     };
 
     next();

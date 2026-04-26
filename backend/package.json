@@ -1,15 +1,17 @@
 {
   "name": "prodcty-backend",
   "version": "0.1.0",
-  "description": "ProdCty Sprint 2 - minimal backend for tests",
+  "description": "ProdCty backend API for samples, demos, voting, profiles, and feedback",
   "scripts": {
-    "test": "jest",
-    "test:coverage": "jest --coverage",
+    "test": "node node_modules/jest/bin/jest.js",
+    "test:coverage": "node node_modules/jest/bin/jest.js --coverage",
+    "check:syntax": "node --check src/app.js && node --check src/models/CollabRequest.js && node --check src/models/Report.js && node --check src/routes/authRoutes.js && node --check src/routes/adminRoutes.js && node --check src/routes/collabRoutes.js && node --check src/routes/trackRoutes.js && node --check src/routes/userRoutes.js && node --check src/utils/seedAdmin.js",
     "start": "node src/server.js"
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "jest-junit": "^16.0.0"
+    "jest-junit": "^16.0.0",
+    "supertest": "^7.1.4"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

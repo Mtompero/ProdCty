@@ -1,33 +1,54 @@
 flowchart TB
-    A["▶ S01 — Auth 🔒"]
+    A["S01 - Auth"]
 
-    subgraph MAIN["Main authenticated area"]
+    subgraph APP["React authenticated app shell"]
         direction LR
-        B["S02 — Library"]
-        C["S03 — Community"]
-        D["S04 — Demos"]
+        B["S02 - Library"]
+        C["S03 - Library Upload Sample"]
+        D["S04 - Demos"]
+        E["S05 - Demo Upload Aura"]
+        F["S06 - Demo Feedback Popup"]
+        G["S07 - Collab Request Popup"]
+        H["S08 - Header Collab Inbox"]
+        I["S09 - Own Profile"]
+        J["S10 - Public Profile"]
+        K["S11 - Admin Overview"]
+        L["S12 - Admin Reports Review"]
+        M["S13 - Admin Users Moderation"]
     end
 
-    E["S05 — Own Profile"]
-    F["S06 — Public Profile View"]
+    A -->|"Login / Register"| B
 
-    A -->|"Login / Register submit"| B
-
-    B <-->|"Top navigation"| C
-    C <-->|"Top navigation"| D
     B <-->|"Top navigation"| D
+    B -->|"Upload sample"| C
+    C -->|"Saved / close"| B
 
-    B -->|"Profile icon"| E
-    C -->|"Profile icon"| E
-    D -->|"Profile icon"| E
+    D -->|"Upload demo"| E
+    E -->|"Aura generated / saved"| D
+    D -->|"Rate / comment"| F
+    F -->|"Close / saved feedback"| D
+    D -->|"Request collab"| G
+    G -->|"Request sent"| H
+    H -->|"Accept / decline"| D
 
-    B -->|"Uploader username link"| F
-    C -->|"Uploader username link"| F
-    D -->|"Uploader username link"| F
-    E -->|"User search result"| F
-    F -->|"Profile icon (own account)"| E
+    B -->|"Profile icon"| I
+    D -->|"Profile icon"| I
+    B -->|"Uploader link / creator search"| J
+    D -->|"Uploader link / creator search"| J
+    F -->|"Comment author link"| J
+    I -->|"Public creator link"| J
+    J -->|"Own profile icon"| I
+
+    K -->|"Open reports"| L
+    K -->|"Users tab"| M
+    L -->|"Reviewed / actioned"| K
+    M -->|"Warn / ban / clear"| K
+
+    B -->|"Admin nav, admin only"| K
+    D -->|"Admin nav, admin only"| K
 
     B -->|"Logout"| A
-    C -->|"Logout"| A
     D -->|"Logout"| A
-    E -->|"Logout"| A
+    I -->|"Logout"| A
+    J -->|"Logout"| A
+    K -->|"Logout"| A

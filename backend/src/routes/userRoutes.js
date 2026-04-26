@@ -36,11 +36,21 @@ function userDto(user) {
   return {
     id: user._id.toString(),
     username: user.username,
-    email: user.email,
+    role: user.role || "user",
+    moderationStatus: user.moderationStatus || "active",
+    warningCount: Number(user.warningCount || 0),
+    moderationReason: user.moderationReason || "",
     interests: user.interests || [],
     bio: user.bio || "",
     avatarUrl: user.avatarUrl || null,
     createdAt: user.createdAt,
+  };
+}
+
+function privateUserDto(user) {
+  return {
+    ...userDto(user),
+    email: user.email,
   };
 }
 
@@ -68,6 +78,7 @@ router.get("/users/search", async (req, res) => {
 
     const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const users = await User.find({
+      role: { $ne: "admin" },
       username: { $regex: escaped, $options: "i" },
     })
       .sort({ username: 1 })
@@ -109,7 +120,7 @@ router.get("/me", requireAuth, async (req, res) => {
       return jsonError(res, 404, "USER_NOT_FOUND", "User not found.");
     }
 
-    return res.json({ user: userDto(user) });
+    return res.json({ user: privateUserDto(user) });
   } catch (err) {
     return jsonError(res, 500, "INTERNAL_ERROR", "Failed to load current user.");
   }
@@ -135,7 +146,7 @@ router.patch("/me", requireAuth, async (req, res) => {
 
     return res.json({
       ok: true,
-      user: userDto(user),
+      user: privateUserDto(user),
     });
   } catch (err) {
     return jsonError(res, 500, "INTERNAL_ERROR", "Failed to update profile.");
@@ -167,7 +178,7 @@ router.post("/me/avatar", requireAuth, multerSingleAvatar, async (req, res) => {
 
     return res.json({
       ok: true,
-      user: userDto(user),
+      user: privateUserDto(user),
     });
   } catch (err) {
     removeStoredFile(req.file && req.file.path);

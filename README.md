@@ -1,69 +1,211 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/VSPuLl7_)
-# Szakdolgozat 2.0 – Sprint 1 Kickoff
+# ProdCty
 
-Szia! Üdv a kurzus első, legfontosabb sprintjében. A következő három hétben nem kódot írsz, hanem feltárod a valódi problémát: interjúzol, piacot elemzel és döntéseket dokumentálsz. Ha jól dolgozol, a sprint végére bizonyítod, hogy létező igényre építesz – ez a teljes projekt alapja.
+A ProdCty egy audiofókuszú közösségi platform producereknek és zenészeknek. A felhasználók sample-eket és demókat tölthetnek fel, lejátszhatják egymás anyagait, szavazhatnak rájuk, valamint demókhoz értékelést és szöveges visszajelzést adhatnak.
 
-## Fájlstruktúra (Sprint 1)
-- `course.yaml`: hallgatói metaadatok és track választás (root szinten marad).
-- `sprints/01/prd.yaml`: a Product Requirements Document (PRD) 0.1-es verziója.
-- `sprints/01/interviews/`: legalább **5** felhasználói interjú JSON jegyzőkönyve.
-- `sprints/01/market/competitors.csv`: legalább **3** versenytárs elemzése.
-- `sprints/01/architecture/adr/`: legalább **1** Architecture Decision Record.
-- `sprints/01/ai/usage_plan.yaml`: MI-használati terv (mire és mire nem használod a copilotot).
-- `sprints/01/ai/ai_log.jsonl`: MI-használat naplója, legalább **N** bejegyzéssel (N a `course.yaml`-ból).
-- `scripts/validate.py`: helyi validátor a sprint leadása előtt.
-- `scripts/schemas/`: JSON sémák (pl. interjúk) a gépi ellenőrzéshez.
+## Fő funkciók
 
-> **Fontos:** minden Sprint 1-specifikus artefaktum a `sprints/01/` mappában él, a validátor is itt keresi őket.
+- Regisztráció és bejelentkezés JWT-alapú munkamenettel
+- Sample library feltöltéssel, szűréssel, lejátszással és letöltéssel
+- Demo board feltöltéssel, aura-megjelenítéssel, lejátszással és feedback popupbal
+- Collab request funkció demo interakcióknál, fejlécben elérhető inboxszal és Accept / Decline döntéssel
+- Upvote és downvote a sample-ökön és demókon
+- Saját és publikus profilnézet avatarral, bio-val, érdeklődési körökkel és feltöltésekkel
+- Role-alapú admin kezelőfelület moderációs statisztikákkal, sample/demo/komment report elbírálással, felhasználói figyelmeztetéssel / tiltással, felhasználó-törléssel, track és komment törléssel
+- GUI/UX dokumentáció, release checklist és MI-használat dokumentáció a `docs/` mappában
 
-## Leadási folyamat
-1. Dolgozz a saját (forkolt) repository-ban, töltsd ki a `course.yaml`-t.
-2. Készíts Pull Requestet (`main` ágra). A PR ugyanaz, mint a beadás.
-3. A CI automatikusan lefut, és PASS / FAIL eredményt ad a sprint követelményeire.
-4. Csak a PASS státuszú PR tekinthető leadottnak.
-5. Leadás előtt futtasd helyben: `python scripts/validate.py --sprint 1`.
+## Tech stack
 
-## Heti ütemterv (javaslat)
-**1. hét – Alapozás**
-- Repository klónozása, `course.yaml` kitöltése (track dokumentálása).
-- `sprints/01/prd.yaml` első verziója: probléma, célcsoport, értékajánlat, scope.
-- `sprints/01/ai/usage_plan.yaml` megírása: célok, guardrail-ek, eszközök.
+- Frontend: React + TypeScript + Vite
+- UI animáció: Framer Motion alapú finom route transition
+- Backend: Node.js, Express
+- Adatbázis: MongoDB + Mongoose
+- Auth: JWT + `bcryptjs`
+- Tesztelés: Jest
+- CI: GitHub Actions
 
-**2. hét – Kutatás**
-- Végezz legalább **5** interjút; rögzítsd a jegyzőkönyveket `sprints/01/interviews/` alatt.
-- Etika: csak engedéllyel rögzíts, anonimizáld a résztvevőket (pszeudonim), PII-t ne adj át MI-nek.
-- Elemezz legalább **3** versenytársat a `sprints/01/market/competitors.csv` fájlban.
-- Hozd meg az első technológiai döntést és dokumentáld az `architecture/adr/` mappában.
+## Repo struktúra
 
-**3. hét – Véglegesítés és leadás**
-- Frissítsd a PRD-t az interjú- és piackutatási insightokkal.
-- Frissítsd az `ai/ai_log.jsonl`-t, hogy elérje a minimum bejegyzésszámot.
-- Futtasd a helyi validátort, javítsd a hibákat, majd készíts PR-t.
+- `frontend-react/` - React + TypeScript + Vite frontend
+- `backend/` - Express API, modellek, route-ok, middleware-ek és tesztek
+- `docs/` - dokumentációs munkapéldányok, UX anyagok, AI fejezet
+- `sprints/` - korábbi sprintanyagok és specifikációk
+- `reports/` - teszt- és coverage riportok
 
-## Interjú-etika és MI guardrail-ek
-- Kérj kifejezett hozzájárulást a felvételhez és jegyzeteléshez.
-- Anonimizáld a jegyzőkönyveket (csak pszeudonim és szegmens szerepeljen).
-- Ne illessz be személyazonosító adatot (PII) külső MI eszközbe.
-- Minden MI kimenetet kritikusan ellenőrizz, a végső döntés mindig a tiéd.
+## Előkövetelmények
 
-## Definition of Done – Sprint 1
-| Tétel | Minimum elvárás | Ellenőrzés |
-| --- | --- | --- |
-| PRD (`sprints/01/prd.yaml`) | `problem.statement`, `target_audience`, `value_proposition`, `scope.in/out` kitöltve | YAML validáció + kulcsok (CI) |
-| Interjúk (`sprints/01/interviews/*.json`) | ≥ **5** fájl, séma szerint | JSON sémaellenőrzés (CI) |
-| Versenytársak (`sprints/01/market/competitors.csv`) | ≥ **3** sor a fejlécen túl | Sorok száma, fejléc (CI) |
-| ADR (`sprints/01/architecture/adr/*.md`) | ≥ **1** Markdown fájl | Fájl léte (CI) |
-| MI dokumentáció (`sprints/01/ai/*`) | Usage plan + napló ≥ **N** bejegyzés | Fájl léte + bejegyzésszám (CI) |
-| Leadás | PR a `main` ágra, zöld CI | PASS szükséges |
+- Node.js 20 vagy újabb
+- npm
+- MongoDB lokálisan, vagy elérhető MongoDB connection string
 
-## Használat
-```bash
-python scripts/validate.py --sprint 1
+## Konfiguráció
+
+Másold le a példakonfigurációt:
+
+```powershell
+copy .env.example backend\.env
 ```
-A szkript ellenőrzi, hogy minden kötelező Sprint 1 artefaktum a megfelelő helyen és formátumban megtalálható-e, továbbá az AI napló eléri-e a `course.yaml`-ban megadott minimumot.
 
-## Forrás
-A tartalom a kurzus hivatalos Hallgatói útmutatója (Sprint 1 fejezet) alapján készült.
+Linux/macOS alatt:
 
-## License
-MIT
+```bash
+cp .env.example backend/.env
+```
+
+Fontosabb változók:
+
+- `PORT` - backend port, alapértelmezetten `3000`
+- `MONGO_URI` - MongoDB kapcsolat, például `mongodb://localhost:27017/prodcty`
+- `JWT_SECRET` - JWT aláíró titok
+- `UPLOAD_DIR` - lokális audio feltöltési könyvtár
+- `ADMIN_EMAIL` - demo admin felhasználó email címe, alapértelmezetten `admin@admin.com`
+- `ADMIN_PASSWORD` - demo admin jelszó, alapértelmezetten `Admin12345`
+
+## Quickstart
+
+### Gyors indítás Windows alatt
+
+Ha Windows alatt szeretnéd a legegyszerűbben elindítani a projektet:
+
+1. Ellenőrizd, hogy fut-e a MongoDB.
+2. Kattints duplán a projekt gyökerében lévő `start-prodcty.bat` fájlra.
+3. Nyisd meg a frontendet:
+
+```text
+http://127.0.0.1:4173
+```
+
+A script külön ablakban indítja a backendet és a React frontendet, közben visszajelzést ad arról, hogy vár a frontend szerverre. Amikor a frontend elérhető, automatikusan megnyitja a böngészőben. Ha valamelyik oldalon hiányzik a `node_modules`, automatikusan lefuttatja az `npm install` parancsot. Ha még nincs `backend/.env`, a `.env.example` alapján létrehozza.
+
+### Manuális indítás
+
+Backend indítása:
+
+```bash
+cd backend
+npm install
+npm start
+```
+
+Sikeres induláskor ezt kell látni:
+
+```text
+[db] connected: mongodb://localhost:27017/prodcty
+ProdCty running at http://localhost:3000
+```
+
+Healthcheck:
+
+```bash
+curl http://localhost:3000/health
+```
+
+Elvárt válasz:
+
+```json
+{"ok":true}
+```
+
+Frontend kipróbálása (React + TypeScript + Vite):
+
+```bash
+cd frontend-react
+npm install
+npm run dev -- --host 127.0.0.1 --port 4173
+```
+
+Alapértelmezett helyi URL:
+
+```text
+http://127.0.0.1:4173
+```
+
+Ajánlott kipróbálási sorrend:
+
+1. Nyisd meg az auth nézetet és regisztrálj egy felhasználót.
+2. Jelentkezz be.
+3. Próbáld ki a Library, Demos, Profile és publikus profile nézeteket.
+4. Admin funkciókhoz jelentkezz be a demo adminnal:
+
+```text
+email: admin@admin.com
+password: Admin12345
+```
+
+Admin belépés után a felső navigációban megjelenik az `Admin` menüpont, amely a `/admin` útvonalra visz.
+
+## Tesztek
+
+Backend tesztek:
+
+```bash
+cd backend
+npm install
+npm test
+```
+
+Syntax check:
+
+```bash
+cd backend
+npm run check:syntax
+```
+
+React frontend build:
+
+```bash
+cd frontend-react
+npm install
+npm run build
+```
+
+Coverage futtatás:
+
+```bash
+cd backend
+npm run test:coverage
+```
+
+## Dokumentáció
+
+A dokumentáció belépési pontja: `docs/00_index.md`
+
+Fontosabb anyagok:
+
+- `docs/ux/` - GUI/UX dokumentáció, screenshotok, pageflow, journey-k
+- `docs/thesis/Tompa_Marton_ProdCty_szakdolgozat.docx` - szakdolgozat munkapéldány
+- `docs/06_release/final_submission_checklist.md` - beadási ellenőrzőlista
+- `docs/07_ai/mesterseges_intelligencia_hasznalata.md` - MI-használat fejezet munkaverziója
+
+## Ajánlott bemutatási sorrend
+
+1. Auth oldal: regisztráció és login
+2. Library: sample feltöltés, keresés, szűrés, lejátszás, letöltés
+3. Demos: demo feltöltés, aura, saját stílus szerinti és top voted nézet
+4. Demo collab: más felhasználó demójánál collab request küldése, majd a fejléc Inbox panelen elfogadás vagy elutasítás
+5. Feedback popup: 1-5 pontszámos feedback, válaszok, saját komment törlése és demo/komment reportolás
+6. Library report: sample licenc / copyright, spam vagy kéretlen tartalom jelzése
+7. Profil: saját és publikus feltöltések áttekintése
+8. Admin: aktív és lezárt reportok elbírálása, felhasználók figyelmeztetése / tiltása / törlése, feltöltések és kommentek moderációs áttekintése
+
+## Ismert korlátok
+
+- A médiafájlok fejlesztői környezetben lokálisan tárolódnak
+- Éles rendszerhez objektumtár és CDN réteg szükséges
+- A recommendation logika egyszerű pontozásra épül, nem teljes értékű ajánlórendszer
+- A frontend React + TypeScript alapú, de a vizuális CSS rétegben még vannak a korábbi statikus prototípusból átvett, fokozatosan tisztítható osztályok
+- A demo admin account fejlesztői/bemutatási célra szolgál, éles környezetben erős, egyedi admin jelszó szükséges
+
+## Biztonsági és működési megjegyzések
+
+- A publikus profil és a creator kereső nem ad vissza email címet
+- A collab requestben megadott Instagram elérés csak elfogadott kérés után látható
+- A play statisztika csak tényleges lejátszásindításkor növekszik
+- Az auth végpontok alap rate limitinget és erősebb jelszóminimumot használnak
+- Két admin figyelmeztetés után a felhasználó automatikusan tiltott státuszba kerül; figyelmeztetéskor belépés után banner jelzi az okot, tiltáskor a login képernyő kap egyértelmű hibaüzenetet
+
+## Troubleshooting
+
+- `DB connect error`: ellenőrizd, hogy fut-e a MongoDB, vagy jó-e a `MONGO_URI`
+- `JWT secret missing`: töltsd ki a `JWT_SECRET` változót a `backend/.env` fájlban
+- `npm is not recognized`: telepítsd a Node.js LTS verziót, majd nyiss új terminált
+- Feltöltési hiba: ellenőrizd, hogy az audiofájl támogatott formátumú és a mérete belefér a validációs limitbe

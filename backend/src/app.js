@@ -4,6 +4,8 @@ const express = require("express");
 const cors = require("cors");
 
 const authRoutes = require("./routes/authRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const collabRoutes = require("./routes/collabRoutes");
 const trackRoutes = require("./routes/trackRoutes");
 const userRoutes = require("./routes/userRoutes");
 const { ensureUploadDir } = require("./utils/audioStorage");
@@ -22,6 +24,8 @@ function createApp() {
   });
 
   app.use("/auth", authRoutes);
+  app.use("/admin", adminRoutes);
+  app.use(collabRoutes);
   app.use(userRoutes);
   app.use(trackRoutes);
 

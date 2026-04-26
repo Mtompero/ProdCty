@@ -13,12 +13,19 @@ const {
 } = require("../utils/validators");
 
 const router = express.Router();
+const authAttempts = new Map();
+const AUTH_WINDOW_MS = 10 * 60 * 1000;
+const AUTH_MAX_ATTEMPTS = 8;
 
 function userDto(user) {
   return {
     id: user._id.toString(),
     username: user.username,
     email: user.email,
+    role: user.role || "user",
+    moderationStatus: user.moderationStatus || "active",
+    warningCount: Number(user.warningCount || 0),
+    moderationReason: user.moderationReason || "",
     interests: user.interests || [],
     bio: user.bio || "",
     avatarUrl: user.avatarUrl || null,
@@ -26,8 +33,43 @@ function userDto(user) {
   };
 }
 
+function getClientKey(req) {
+  return String(req.ip || req.headers["x-forwarded-for"] || "unknown");
+}
+
+function isRateLimited(req) {
+  const key = getClientKey(req);
+  const now = Date.now();
+  const entry = authAttempts.get(key);
+  if (!entry || now > entry.resetAt) {
+    authAttempts.set(key, { count: 0, resetAt: now + AUTH_WINDOW_MS });
+    return false;
+  }
+  return entry.count >= AUTH_MAX_ATTEMPTS;
+}
+
+function recordFailedAttempt(req) {
+  const key = getClientKey(req);
+  const now = Date.now();
+  const entry = authAttempts.get(key);
+  if (!entry || now > entry.resetAt) {
+    authAttempts.set(key, { count: 1, resetAt: now + AUTH_WINDOW_MS });
+    return;
+  }
+  entry.count += 1;
+  authAttempts.set(key, entry);
+}
+
+function clearFailedAttempts(req) {
+  authAttempts.delete(getClientKey(req));
+}
+
 router.post("/register", async (req, res) => {
   try {
+    if (isRateLimited(req)) {
+      return jsonError(res, 429, "RATE_LIMITED", "Too many auth attempts. Please wait and try again.");
+    }
+
     const username = req.body && req.body.username ? String(req.body.username) : "";
     const email = req.body && req.body.email ? String(req.body.email) : "";
     const password = req.body && req.body.password ? String(req.body.password) : "";
@@ -39,8 +81,8 @@ router.post("/register", async (req, res) => {
     if (!isValidEmail(email)) {
       return jsonError(res, 400, "VALIDATION_ERROR", "email is invalid.");
     }
-    if (!isNonEmptyString(password) || password.length < 6) {
-      return jsonError(res, 400, "VALIDATION_ERROR", "password must be at least 6 characters.");
+    if (!isNonEmptyString(password) || password.length < 8) {
+      return jsonError(res, 400, "VALIDATION_ERROR", "password must be at least 8 characters.");
     }
 
     const emailNorm = email.trim().toLowerCase();
@@ -48,11 +90,13 @@ router.post("/register", async (req, res) => {
 
     const emailExists = await User.findOne({ email: emailNorm }).lean();
     if (emailExists) {
+      recordFailedAttempt(req);
       return jsonError(res, 409, "EMAIL_TAKEN", "This email is already registered.");
     }
 
     const usernameExists = await User.findOne({ username: usernameNorm }).lean();
     if (usernameExists) {
+      recordFailedAttempt(req);
       return jsonError(res, 409, "USERNAME_TAKEN", "This username is already taken.");
     }
 
@@ -66,6 +110,8 @@ router.post("/register", async (req, res) => {
       createdAt: new Date(),
     });
 
+    clearFailedAttempts(req);
+
     return res.status(201).json({
       ok: true,
       user: userDto(created),
@@ -73,6 +119,11 @@ router.post("/register", async (req, res) => {
   } catch (err) {
     const isDup = err && (err.code === 11000 || String(err.message || "").includes("E11000"));
     if (isDup) {
+      recordFailedAttempt(req);
+      const dupField = err && err.keyPattern ? Object.keys(err.keyPattern)[0] : "";
+      if (dupField === "username") {
+        return jsonError(res, 409, "USERNAME_TAKEN", "This username is already taken.");
+      }
       return jsonError(res, 409, "EMAIL_TAKEN", "This email is already registered.");
     }
     return jsonError(res, 500, "INTERNAL_ERROR", "Failed to register user.");
@@ -81,6 +132,10 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
+    if (isRateLimited(req)) {
+      return jsonError(res, 429, "RATE_LIMITED", "Too many auth attempts. Please wait and try again.");
+    }
+
     const email = req.body && req.body.email ? String(req.body.email) : "";
     const password = req.body && req.body.password ? String(req.body.password) : "";
 
@@ -95,13 +150,25 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ email: emailNorm }).lean();
 
     if (!user) {
+      recordFailedAttempt(req);
       return jsonError(res, 401, "INVALID_CREDENTIALS", "Invalid email or password.");
     }
 
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) {
+      recordFailedAttempt(req);
       return jsonError(res, 401, "INVALID_CREDENTIALS", "Invalid email or password.");
     }
+    if (user.moderationStatus === "banned") {
+      return jsonError(
+        res,
+        403,
+        "ACCOUNT_BANNED",
+        `Your account is banned. Reason: ${user.moderationReason || "Repeated moderation violations."}`
+      );
+    }
+
+    clearFailedAttempts(req);
 
     const secret = process.env.JWT_SECRET;
     if (!secret || String(secret).trim().length < 12) {
@@ -109,7 +176,14 @@ router.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { sub: user._id.toString(), username: user.username, email: user.email },
+      {
+        sub: user._id.toString(),
+        username: user.username,
+        email: user.email,
+        avatarUrl: user.avatarUrl || "",
+        role: user.role || "user",
+        moderationStatus: user.moderationStatus || "active",
+      },
       secret,
       { expiresIn: "7d" }
     );
