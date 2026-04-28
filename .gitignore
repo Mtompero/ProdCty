@@ -24,6 +24,7 @@ __pycache__/
 
 # Env files
 .env
+*.env.local
 backend/uploads/
 
 # OS files

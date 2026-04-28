@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type { Track } from "../types";
-import { formatDuration, formatFileSize, formatRating } from "../lib/format";
+import { buildApiUrl, formatDuration, formatFileSize, formatRating } from "../lib/format";
 import { usePlayer } from "../contexts/PlayerContext";
 import { TrackArtwork } from "./TrackArtwork";
 import { TrackVoteControls } from "./TrackVoteControls";
@@ -91,7 +91,7 @@ export function ProfileTrackList({
                 {trackIsPlaying ? "||" : ">"}
               </button>
               {track.downloadUrl ? (
-                <a className="btn ghost" href={`${import.meta.env.VITE_API_URL || "http://localhost:3000"}${track.downloadUrl}`}>
+                <a className="btn ghost" href={buildApiUrl(track.downloadUrl)}>
                   Download
                 </a>
               ) : null}

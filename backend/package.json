@@ -5,7 +5,7 @@
   "scripts": {
     "test": "node node_modules/jest/bin/jest.js",
     "test:coverage": "node node_modules/jest/bin/jest.js --coverage",
-    "check:syntax": "node --check src/app.js && node --check src/models/CollabRequest.js && node --check src/models/Report.js && node --check src/routes/authRoutes.js && node --check src/routes/adminRoutes.js && node --check src/routes/collabRoutes.js && node --check src/routes/trackRoutes.js && node --check src/routes/userRoutes.js && node --check src/utils/seedAdmin.js",
+    "check:syntax": "node --check src/app.js && node --check src/models/CollabRequest.js && node --check src/models/Report.js && node --check src/routes/authRoutes.js && node --check src/routes/adminRoutes.js && node --check src/routes/collabRoutes.js && node --check src/routes/trackRoutes.js && node --check src/routes/userRoutes.js && node --check src/utils/audioStorage.js && node --check src/utils/mediaStorage.js && node --check src/utils/serializers.js && node --check src/utils/seedAdmin.js",
     "start": "node src/server.js"
   },
   "devDependencies": {
@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.10.0",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",

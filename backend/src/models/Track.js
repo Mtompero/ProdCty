@@ -116,6 +116,17 @@ const trackSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    storageProvider: {
+      type: String,
+      enum: ["local", "cloudinary"],
+      default: "local",
+      index: true
+    },
+    storageResourceType: {
+      type: String,
+      default: "auto",
+      trim: true
+    },
     storagePath: {
       type: String,
       required: true

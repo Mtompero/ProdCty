@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchTrack, fetchTracks, reportTrack, uploadTrack, voteTrack } from "../lib/api";
-import { formatDuration, formatFileSize } from "../lib/format";
+import { buildApiUrl, formatDuration, formatFileSize } from "../lib/format";
 import { buildTrackUploadFormData } from "../lib/upload";
 import { INTEREST_OPTIONS, formatInterestLabel, normalizeInterestList } from "../lib/interests";
 import { useAuth } from "../contexts/AuthContext";
@@ -424,7 +424,7 @@ export function LibraryPage() {
                         {trackIsPlaying ? "||" : "▶"}
                       </button>
                       {track.downloadUrl ? (
-                        <a className="btn ghost small" href={`${import.meta.env.VITE_API_URL || "http://localhost:3000"}${track.downloadUrl}`}>
+                        <a className="btn ghost small" href={buildApiUrl(track.downloadUrl)}>
                           Download
                         </a>
                       ) : null}

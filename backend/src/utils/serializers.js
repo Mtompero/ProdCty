@@ -23,6 +23,8 @@ function trackDto(track) {
   }
 
   const id = track._id?.toString ? track._id.toString() : String(track._id || track.id);
+  const isCloudMedia = track.storageProvider === "cloudinary" && track.audioUrl;
+  const audioUrl = isCloudMedia ? track.audioUrl : `/tracks/${id}/stream`;
 
   return {
     id,
@@ -44,8 +46,8 @@ function trackDto(track) {
     originalFileName: track.originalFileName || null,
     mimeType: track.mimeType || null,
     fileSize: track.fileSize || null,
-    audioUrl: `/tracks/${id}/stream`,
-    downloadUrl: track.kind === "sample" ? `/tracks/${id}/download` : null,
+    audioUrl,
+    downloadUrl: track.kind === "sample" ? (isCloudMedia ? track.audioUrl : `/tracks/${id}/download`) : null,
     isDownloadable: track.kind === "sample",
     ratingAverage: Number(track.ratingAverage || 0),
     ratingCount: Number(track.ratingCount || 0),

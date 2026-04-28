@@ -1,10 +1,12 @@
 "use strict";
 
 const {
-  createDiskUploadMiddleware,
+  createUploadMiddleware,
   ensureUploadDir,
+  isCloudinaryEnabled,
   getStoredFileMeta,
   removeStoredFile,
+  uploadBufferToCloudinary,
   uploadDir,
 } = require("./mediaStorage");
 
@@ -45,7 +47,7 @@ function isAllowedAudioMimeType(mimeType) {
 }
 
 function createAudioUploadMiddleware() {
-  return createDiskUploadMiddleware({
+  return createUploadMiddleware({
     maxFileSize: 25 * 1024 * 1024,
     fileFilter(req, file, cb) {
       if (!isAllowedAudioMimeType(file.mimetype)) {
@@ -61,6 +63,16 @@ function getStoredAudioMeta(file) {
   return getStoredFileMeta(file);
 }
 
+async function storeUploadedAudio(file) {
+  if (isCloudinaryEnabled()) {
+    return uploadBufferToCloudinary(file, {
+      folder: process.env.CLOUDINARY_AUDIO_FOLDER || "prodcty/audio",
+      resourceType: "video",
+    });
+  }
+  return getStoredAudioMeta(file);
+}
+
 module.exports = {
   ensureUploadDir,
   createAudioUploadMiddleware,
@@ -68,5 +80,6 @@ module.exports = {
   getStoredAudioMeta,
   isAllowedAudioMimeType,
   removeStoredFile,
+  storeUploadedAudio,
   uploadDir,
 };

@@ -14,8 +14,8 @@ const TrackVote = require("../models/TrackVote");
 const User = require("../models/User");
 const {
   createAudioUploadMiddleware,
-  getStoredAudioMeta,
   removeStoredFile,
+  storeUploadedAudio,
 } = require("../utils/audioStorage");
 const { analyzeTrackMetadata } = require("../utils/analysis");
 const { jsonError } = require("../utils/http");
@@ -321,6 +321,9 @@ router.get("/tracks/:id/stream", async (req, res) => {
     if (!track) {
       return jsonError(res, 404, "TRACK_NOT_FOUND", "Track not found.");
     }
+    if (track.storageProvider === "cloudinary" && track.audioUrl) {
+      return res.redirect(track.audioUrl);
+    }
 
     const stats = await fs.promises.stat(track.storagePath);
     const mimeType = track.mimeType || "audio/mpeg";
@@ -366,6 +369,10 @@ router.get("/tracks/:id/download", async (req, res) => {
     if (track.kind !== "sample") {
       return jsonError(res, 403, "FORBIDDEN", "Demo tracks cannot be downloaded.");
     }
+    if (track.storageProvider === "cloudinary" && track.audioUrl) {
+      res.setHeader("Content-Disposition", `attachment; filename="${String(track.originalFileName || "sample").replace(/"/g, "")}"`);
+      return res.redirect(track.audioUrl);
+    }
 
     return res.download(track.storagePath, track.originalFileName);
   } catch (err) {
@@ -383,7 +390,7 @@ router.delete("/tracks/:id", requireAuth, async (req, res) => {
       return jsonError(res, 403, "FORBIDDEN", "You can only delete your own tracks.");
     }
 
-    removeStoredFile(track.storagePath);
+    await removeStoredFile(track.storagePath, track.storageProvider, track.storageResourceType);
     await CollabRequest.deleteMany({ trackId: track._id });
     await Comment.deleteMany({ trackId: track._id.toString() });
     await Rating.deleteMany({ trackId: track._id.toString() });
@@ -492,7 +499,7 @@ router.post("/tracks/:id/reports", requireAuth, async (req, res) => {
 router.post("/tracks", requireAuth, multerSingleAudio, async (req, res) => {
   try {
     if (await rejectBannedUser(req, res)) {
-      removeStoredFile(req.file && req.file.path);
+      await removeStoredFile(req.file && req.file.path);
       return;
     }
 
@@ -507,15 +514,15 @@ router.post("/tracks", requireAuth, multerSingleAudio, async (req, res) => {
     const audioCheck = validateUploadedAudioFile(req.file);
 
     if (!isNonEmptyString(title)) {
-      removeStoredFile(req.file && req.file.path);
+      await removeStoredFile(req.file && req.file.path);
       return jsonError(res, 400, "VALIDATION_ERROR", "title is required.");
     }
     if (!audioCheck.ok) {
-      removeStoredFile(req.file && req.file.path);
+      await removeStoredFile(req.file && req.file.path);
       return jsonError(res, 400, "VALIDATION_ERROR", audioCheck.message);
     }
 
-    const storedAudio = getStoredAudioMeta(req.file);
+    const storedAudio = await storeUploadedAudio(req.file);
     const analysis = analyzeTrackMetadata({
       title,
       originalFileName: storedAudio.originalFileName,
@@ -547,17 +554,21 @@ router.post("/tracks", requireAuth, multerSingleAudio, async (req, res) => {
       originalFileName: storedAudio.originalFileName,
       mimeType: storedAudio.mimeType,
       fileSize: storedAudio.fileSize,
-      audioUrl: "/pending-stream-url",
+      audioUrl: storedAudio.url || "/pending-stream-url",
+      storageProvider: storedAudio.storageProvider || "local",
+      storageResourceType: storedAudio.resourceType || "auto",
       storagePath: storedAudio.storagePath,
       createdAt: new Date(),
     });
 
-    created.audioUrl = `/tracks/${created._id.toString()}/stream`;
+    if (!storedAudio.url) {
+      created.audioUrl = `/tracks/${created._id.toString()}/stream`;
+    }
     await created.save();
 
     return res.status(201).json(trackDto(created));
   } catch (err) {
-    removeStoredFile(req.file && req.file.path);
+    await removeStoredFile(req.file && req.file.path);
     return jsonError(res, 500, "INTERNAL_ERROR", "Failed to create track.");
   }
 });

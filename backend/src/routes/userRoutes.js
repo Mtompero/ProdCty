@@ -7,8 +7,8 @@ const Track = require("../models/Track");
 const User = require("../models/User");
 const {
   createImageUploadMiddleware,
-  getStoredImageMeta,
   removeStoredFile,
+  storeUploadedImage,
 } = require("../utils/mediaStorage");
 const { jsonError } = require("../utils/http");
 const {
@@ -157,23 +157,25 @@ router.post("/me/avatar", requireAuth, multerSingleAvatar, async (req, res) => {
   try {
     const imageCheck = validateUploadedImageFile(req.file);
     if (!imageCheck.ok) {
-      removeStoredFile(req.file && req.file.path);
+      await removeStoredFile(req.file && req.file.path);
       return jsonError(res, 400, "VALIDATION_ERROR", imageCheck.message);
     }
 
     const user = await User.findById(req.user.id);
     if (!user) {
-      removeStoredFile(req.file && req.file.path);
+      await removeStoredFile(req.file && req.file.path);
       return jsonError(res, 404, "USER_NOT_FOUND", "User not found.");
     }
 
-    const storedImage = getStoredImageMeta(req.file);
+    const storedImage = await storeUploadedImage(req.file);
     if (user.avatarStoragePath) {
-      removeStoredFile(user.avatarStoragePath);
+      await removeStoredFile(user.avatarStoragePath, user.avatarStorageProvider, user.avatarStorageResourceType);
     }
 
-    user.avatarUrl = `/users/${user._id.toString()}/avatar`;
+    user.avatarUrl = storedImage.url || `/users/${user._id.toString()}/avatar`;
     user.avatarStoragePath = storedImage.storagePath;
+    user.avatarStorageProvider = storedImage.storageProvider || "local";
+    user.avatarStorageResourceType = storedImage.resourceType || "image";
     await user.save();
 
     return res.json({
@@ -181,7 +183,7 @@ router.post("/me/avatar", requireAuth, multerSingleAvatar, async (req, res) => {
       user: privateUserDto(user),
     });
   } catch (err) {
-    removeStoredFile(req.file && req.file.path);
+    await removeStoredFile(req.file && req.file.path);
     return jsonError(res, 500, "INTERNAL_ERROR", "Failed to upload avatar.");
   }
 });
@@ -191,6 +193,9 @@ router.get("/users/:id/avatar", async (req, res) => {
     const user = await User.findById(String(req.params.id)).lean().catch(() => null);
     if (!user || !isNonEmptyString(user.avatarStoragePath)) {
       return jsonError(res, 404, "AVATAR_NOT_FOUND", "Avatar not found.");
+    }
+    if (user.avatarStorageProvider === "cloudinary" && user.avatarUrl) {
+      return res.redirect(user.avatarUrl);
     }
 
     return res.sendFile(user.avatarStoragePath);

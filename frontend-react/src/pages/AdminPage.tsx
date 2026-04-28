@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  API_URL,
   adminDeleteUser,
   adminDeleteComment,
   adminDeleteTrack,
@@ -14,7 +13,7 @@ import {
   updateAdminReport,
   updateUserModeration,
 } from "../lib/api";
-import { formatDate, formatDuration, formatFileSize, formatTimestamp } from "../lib/format";
+import { buildApiUrl, formatDate, formatDuration, formatFileSize, formatTimestamp } from "../lib/format";
 import { useAuth } from "../contexts/AuthContext";
 import { Modal } from "../components/Modal";
 import { WaveformPreview } from "../components/WaveformPreview";
@@ -627,7 +626,7 @@ function AdminInlinePlayer({ track }: { track: Track }) {
   const [volume, setVolume] = useState(0.55);
 
   const audioSrc = useMemo(
-    () => `${API_URL}${track.audioUrl}${track.audioUrl.includes("?") ? "&" : "?"}t=${Date.now()}`,
+    () => buildApiUrl(track.audioUrl, true),
     [track.audioUrl, track.id]
   );
 

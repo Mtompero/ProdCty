@@ -47,7 +47,7 @@ async function deleteUserUploads(userId) {
   const trackIds = tracks.map((track) => track._id);
   const trackIdStrings = trackIds.map((id) => id.toString());
 
-  tracks.forEach((track) => removeStoredAudioFile(track.storagePath));
+  await Promise.all(tracks.map((track) => removeStoredAudioFile(track.storagePath, track.storageProvider, track.storageResourceType)));
 
   await Promise.all([
     CollabRequest.deleteMany({ trackId: { $in: trackIds } }),
@@ -219,7 +219,7 @@ router.delete("/users/:id", async (req, res) => {
     }
 
     const deletedTrackCount = await deleteUserUploads(userId);
-    removeStoredMediaFile(user.avatarStoragePath);
+    await removeStoredMediaFile(user.avatarStoragePath, user.avatarStorageProvider, user.avatarStorageResourceType);
 
     const userComments = await Comment.find({ userId }).select("_id").lean();
     const userCommentIds = userComments.map((comment) => comment._id);
@@ -295,7 +295,7 @@ router.delete("/tracks/:id", async (req, res) => {
       return jsonError(res, 404, "TRACK_NOT_FOUND", "Track not found.");
     }
 
-    removeStoredAudioFile(track.storagePath);
+    await removeStoredAudioFile(track.storagePath, track.storageProvider, track.storageResourceType);
     await Promise.all([
       Comment.deleteMany({ trackId: track._id.toString() }),
       Rating.deleteMany({ trackId: track._id.toString() }),

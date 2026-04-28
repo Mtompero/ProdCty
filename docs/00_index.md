@@ -74,5 +74,6 @@ npm run build
 - Konfiguráció: `.env.example` létrehozva.
 - UX dokumentáció: `docs/ux/` alatt elérhető.
 - Végső ütemezés checklist: [docs/06_release/final_submission_checklist.md](06_release/final_submission_checklist.md)
+- Online deploy útmutató: [docs/06_release/deployment_guide.md](06_release/deployment_guide.md)
 - Szakdolgozat munkapéldány: [docs/thesis/Tompa_Marton_ProdCty_szakdolgozat.docx](thesis/Tompa_Marton_ProdCty_szakdolgozat.docx)
 - A végleges PDF első teljes verziója még külön előállítandó a május 3-i mérföldkőig.

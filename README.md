@@ -59,6 +59,10 @@ Fontosabb változók:
 - `UPLOAD_DIR` - lokális audio feltöltési könyvtár
 - `ADMIN_EMAIL` - demo admin felhasználó email címe, alapértelmezetten `admin@admin.com`
 - `ADMIN_PASSWORD` - demo admin jelszó, alapértelmezetten `Admin12345`
+- `CORS_ORIGIN` - vesszővel elválasztott engedélyezett frontend domainek production környezetben
+- `MEDIA_STORAGE_PROVIDER` - `local` vagy `cloudinary`
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` - Cloudinary média storage kulcsok
+- `VITE_API_URL` - a React frontend production API URL-je Vercelen, például `https://prodcty-api.onrender.com`
 
 ## Quickstart
 
@@ -174,6 +178,7 @@ Fontosabb anyagok:
 - `docs/ux/` - GUI/UX dokumentáció, screenshotok, pageflow, journey-k
 - `docs/thesis/Tompa_Marton_ProdCty_szakdolgozat.docx` - szakdolgozat munkapéldány
 - `docs/06_release/final_submission_checklist.md` - beadási ellenőrzőlista
+- `docs/06_release/deployment_guide.md` - Render + Vercel + MongoDB Atlas + Cloudinary online deploy útmutató
 - `docs/07_ai/mesterseges_intelligencia_hasznalata.md` - MI-használat fejezet munkaverziója
 
 ## Ajánlott bemutatási sorrend
@@ -189,8 +194,8 @@ Fontosabb anyagok:
 
 ## Ismert korlátok
 
-- A médiafájlok fejlesztői környezetben lokálisan tárolódnak
-- Éles rendszerhez objektumtár és CDN réteg szükséges
+- A médiafájlok fejlesztői környezetben lokálisan, production környezetben Cloudinary storage/CDN rétegen tárolhatók
+- Éles rendszerhez a Cloudinary környezeti változók és a publikus backend/frontend domainek beállítása szükséges
 - A recommendation logika egyszerű pontozásra épül, nem teljes értékű ajánlórendszer
 - A frontend React + TypeScript alapú, de a vizuális CSS rétegben még vannak a korábbi statikus prototípusból átvett, fokozatosan tisztítható osztályok
 - A demo admin account fejlesztői/bemutatási célra szolgál, éles környezetben erős, egyedi admin jelszó szükséges

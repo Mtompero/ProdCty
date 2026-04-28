@@ -15,8 +15,20 @@ function createApp() {
   ensureUploadDir();
 
   const app = express();
+  const allowedOrigins = String(process.env.CORS_ORIGIN || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
 
-  app.use(cors());
+  app.use(cors({
+    origin(origin, callback) {
+      if (!origin || !allowedOrigins.length || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error("Not allowed by CORS."));
+    },
+  }));
   app.use(express.json({ limit: "25mb" }));
 
   app.get("/health", (req, res) => {

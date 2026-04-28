@@ -13,6 +13,8 @@ const userSchema = new mongoose.Schema(
     bio: { type: String, default: "", trim: true, maxlength: 240 },
     avatarUrl: { type: String, default: "", trim: true },
     avatarStoragePath: { type: String, default: "" },
+    avatarStorageProvider: { type: String, enum: ["local", "cloudinary"], default: "local" },
+    avatarStorageResourceType: { type: String, default: "image", trim: true },
     createdAt: { type: Date, default: Date.now },
   },
   { versionKey: false }

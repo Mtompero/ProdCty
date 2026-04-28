@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { registerPlay } from "../lib/api";
+import { buildApiUrl } from "../lib/format";
 import type { Track } from "../types";
 
 type PlayerContextValue = {
@@ -47,7 +48,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     await registerPlay(track.id);
     audio.pause();
     audio.volume = 0.55;
-    audio.src = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}${track.audioUrl}${track.audioUrl.includes("?") ? "&" : "?"}t=${Date.now()}`;
+    audio.src = buildApiUrl(track.audioUrl, true);
     audio.load();
     await audio.play().catch(() => undefined);
     setIsPlaying(true);

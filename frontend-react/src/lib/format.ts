@@ -2,9 +2,18 @@ export function escapeFallback(value: string | null | undefined, fallback: strin
   return value && value.trim().length ? value : fallback;
 }
 
+export function isAbsoluteUrl(value?: string | null) {
+  return /^https?:\/\//i.test(String(value || ""));
+}
+
+export function buildApiUrl(path?: string | null, cacheBust = false) {
+  if (!path) return "";
+  const url = isAbsoluteUrl(path) ? path : `${import.meta.env.VITE_API_URL || "http://localhost:3000"}${path}`;
+  return cacheBust ? `${url}${url.includes("?") ? "&" : "?"}t=${Date.now()}` : url;
+}
+
 export function buildMediaUrl(path?: string | null) {
-  const base = import.meta.env.VITE_API_URL || "http://localhost:3000";
-  return path ? `${base}${path}${path.includes("?") ? "&" : "?"}t=${Date.now()}` : "";
+  return buildApiUrl(path, true);
 }
 
 export function formatDuration(seconds?: number | null) {
