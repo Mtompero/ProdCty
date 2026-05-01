@@ -68,7 +68,7 @@ export function AdminPage() {
     ]);
 
     if (overviewResult.data) setOverview(overviewResult.data);
-    if (usersResult.data) setUsers(usersResult.data.items);
+    if (usersResult.data) setUsers(usersResult.data.items.filter((item) => item.id !== user?.id && item.role !== "admin"));
     if (tracksResult.data) setTracks(tracksResult.data.items);
     if (commentsResult.data) setComments(commentsResult.data.items);
     if (reportsResult.data) setReports(reportsResult.data.items);
@@ -508,7 +508,9 @@ export function AdminPage() {
               <span>Joined</span>
               <span>Action</span>
             </div>
-            {users.map((adminUser) => (
+            {users
+              .filter((adminUser) => adminUser.id !== user?.id && adminUser.role !== "admin")
+              .map((adminUser) => (
               <div className="admin-row admin-user-row" key={adminUser.id}>
                 <span>
                   <strong>{adminUser.username}</strong>
@@ -532,11 +534,9 @@ export function AdminPage() {
                   >
                     Moderate
                   </button>
-                  {adminUser.role !== "admin" ? (
-                    <button className="btn danger small" onClick={() => void handleDeleteUser(adminUser.id, adminUser.username)}>
-                      Delete user
-                    </button>
-                  ) : null}
+                  <button className="btn danger small" onClick={() => void handleDeleteUser(adminUser.id, adminUser.username)}>
+                    Delete user
+                  </button>
                 </span>
               </div>
             ))}

@@ -168,12 +168,17 @@ router.patch("/users/:id/moderation", async (req, res) => {
   try {
     const action = String((req.body && req.body.action) || "").trim().toLowerCase();
     const reason = String((req.body && req.body.reason) || "").trim().slice(0, 300);
-    const user = await User.findById(String(req.params.id));
+    const userId = String(req.params.id);
+    if (userId === String(req.user.id)) {
+      return jsonError(res, 400, "VALIDATION_ERROR", "Admins cannot moderate their own account from this panel.");
+    }
+
+    const user = await User.findById(userId);
     if (!user) {
       return jsonError(res, 404, "USER_NOT_FOUND", "User not found.");
     }
-    if (user.role === "admin" && action === "ban") {
-      return jsonError(res, 400, "VALIDATION_ERROR", "Admin users cannot be banned from this panel.");
+    if (user.role === "admin") {
+      return jsonError(res, 400, "VALIDATION_ERROR", "Admin users cannot be moderated from this panel.");
     }
 
     if (action === "warn") {
@@ -265,7 +270,7 @@ router.delete("/users/:id", async (req, res) => {
 
 router.get("/users", async (req, res) => {
   try {
-    const users = await User.find({}).sort({ createdAt: -1 }).limit(100).lean();
+    const users = await User.find({ _id: { $ne: req.user.id } }).sort({ createdAt: -1 }).limit(100).lean();
     return res.json({ items: users.map(adminUserDto) });
   } catch (err) {
     return jsonError(res, 500, "INTERNAL_ERROR", "Failed to load users.");

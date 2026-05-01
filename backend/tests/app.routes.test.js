@@ -321,4 +321,43 @@ describe("app routes", () => {
     expect(response.body.user.warningCount).toBe(2);
     expect(save).toHaveBeenCalled();
   });
+
+  test("admin moderation rejects self moderation before loading a user", async () => {
+    const token = jwt.sign(
+      { sub: "admin1", username: "admin", email: "admin@admin.com", role: "admin" },
+      process.env.JWT_SECRET
+    );
+
+    const app = createApp();
+    const response = await request(app)
+      .patch("/admin/users/admin1/moderation")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ action: "warn", reason: "Self warning should not be allowed." });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.code).toBe("VALIDATION_ERROR");
+    expect(User.findById).not.toHaveBeenCalled();
+  });
+
+  test("admin moderation rejects other admin accounts", async () => {
+    const token = jwt.sign(
+      { sub: "admin1", username: "admin", email: "admin@admin.com", role: "admin" },
+      process.env.JWT_SECRET
+    );
+    User.findById.mockResolvedValueOnce({
+      _id: "admin2",
+      username: "other-admin",
+      email: "other-admin@example.com",
+      role: "admin",
+    });
+
+    const app = createApp();
+    const response = await request(app)
+      .patch("/admin/users/admin2/moderation")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ action: "warn", reason: "Admin warning should not be allowed." });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.code).toBe("VALIDATION_ERROR");
+  });
 });
