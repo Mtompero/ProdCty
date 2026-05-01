@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchTrack, fetchTracks, reportTrack, uploadTrack, voteTrack } from "../lib/api";
 import { buildApiUrl, formatDuration, formatFileSize } from "../lib/format";
-import { buildTrackUploadFormData } from "../lib/upload";
+import { AUDIO_DURATION_LIMITS_SEC, buildTrackUploadFormData, validateAudioDuration } from "../lib/upload";
 import { INTEREST_OPTIONS, formatInterestLabel, normalizeInterestList } from "../lib/interests";
 import { useAuth } from "../contexts/AuthContext";
 import { usePlayer } from "../contexts/PlayerContext";
@@ -54,6 +54,8 @@ export function LibraryPage() {
   const [samples, setSamples] = useState<Track[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [licenseConfirmOpen, setLicenseConfirmOpen] = useState(false);
+  const [pendingUploadFormData, setPendingUploadFormData] = useState<FormData | null>(null);
   const [uploadMessage, setUploadMessage] = useState("");
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [reportOpen, setReportOpen] = useState(false);
@@ -135,6 +137,28 @@ export function LibraryPage() {
     }
   }
 
+  async function prepareUpload(formData: FormData) {
+    if (!token || !uploadFile) {
+      setUploadMessage("Choose a file and log in first.");
+      return;
+    }
+
+    const durationCheck = await validateAudioDuration(uploadFile, "sample");
+    if (!durationCheck.ok) {
+      setUploadMessage(durationCheck.message);
+      return;
+    }
+
+    setUploadMessage("");
+    setPendingUploadFormData(formData);
+    setLicenseConfirmOpen(true);
+  }
+
+  function closeLicenseConfirm() {
+    setLicenseConfirmOpen(false);
+    setPendingUploadFormData(null);
+  }
+
   async function handleUpload(formData: FormData) {
     if (!token || !uploadFile) {
       setUploadMessage("Choose a file and log in first.");
@@ -159,6 +183,7 @@ export function LibraryPage() {
       },
       "sample"
     );
+    payload.set("licenseConfirmed", "true");
 
     const result = await uploadTrack(token, payload);
     if (!result.ok) {
@@ -167,6 +192,8 @@ export function LibraryPage() {
     }
 
     setUploadMessage("Sample uploaded.");
+    setLicenseConfirmOpen(false);
+    setPendingUploadFormData(null);
     setUploadOpen(false);
     setUploadFile(null);
     setSelectedGenres([]);
@@ -213,26 +240,28 @@ export function LibraryPage() {
 
   function openUploadSample() {
     if (!token) {
-      navigate("/auth");
+      navigate("/login");
       return;
     }
     setUploadOpen(true);
   }
 
+  useEffect(() => {
+    function handleHeaderUpload(event: Event) {
+      const detail = (event as CustomEvent<{ kind?: string }>).detail;
+      if (detail?.kind === "sample") {
+        openUploadSample();
+      }
+    }
+
+    window.addEventListener("prodcty:open-upload", handleHeaderUpload);
+    return () => window.removeEventListener("prodcty:open-upload", handleHeaderUpload);
+  }, [token]);
+
   return (
     <main className="page-shell app-shell">
       <section className="app-layout library-page-layout">
-        <aside className="app-column app-sidebar">
-          <section className="surface-block">
-            <div className="panel-header">
-              <h2>Upload sample</h2>
-              <p className="muted">Drop in a loop or sample and publish it to the library.</p>
-            </div>
-            <button className="btn primary" type="button" onClick={openUploadSample}>
-              Upload sample
-            </button>
-          </section>
-        </aside>
+        <aside className="app-column app-sidebar" aria-hidden="true"></aside>
 
         <section className="app-column app-main">
           <section className="hero compact app-hero">
@@ -493,7 +522,7 @@ export function LibraryPage() {
           className="stack-form"
           onSubmit={(event) => {
             event.preventDefault();
-            void handleUpload(new FormData(event.currentTarget));
+            void prepareUpload(new FormData(event.currentTarget));
           }}
         >
           <label>
@@ -505,7 +534,9 @@ export function LibraryPage() {
               onChange={(event) => setUploadFile(event.target.files?.[0] || null)}
             />
           </label>
-          <div className="field-hint">{uploadFile ? `${uploadFile.name} | ${formatFileSize(uploadFile.size)}` : "No audio file selected."}</div>
+          <div className="field-hint">
+            {uploadFile ? `${uploadFile.name} | ${formatFileSize(uploadFile.size)}` : `No audio file selected. Max length: ${AUDIO_DURATION_LIMITS_SEC.sample} seconds.`}
+          </div>
           <label>
             Title
             <input name="title" placeholder="Dusty Vinyl Loop" required />
@@ -553,6 +584,50 @@ export function LibraryPage() {
           </button>
           {uploadMessage ? <div className={`msg ${uploadMessage.includes("uploaded") ? "ok" : "err"}`}>{uploadMessage}</div> : null}
         </form>
+      </Modal>
+
+      <Modal
+        open={licenseConfirmOpen}
+        onClose={closeLicenseConfirm}
+        panelClassName="legal-confirm-dialog-panel"
+        header={
+          <div className="panel-header row-between">
+            <div>
+              <p className="eyebrow">License confirmation</p>
+              <h2>Confirm sample rights</h2>
+            </div>
+            <button className="btn ghost" type="button" onClick={closeLicenseConfirm}>
+              Back
+            </button>
+          </div>
+        }
+      >
+        <div className="legal-confirm-card">
+          <p>
+            Before publishing this sample, confirm that you own it or have permission to share it as royalty-free content in the ProdCty library.
+          </p>
+          <ul>
+            <li>The sample must be your own recording, your own production, or content you are allowed to redistribute.</li>
+            <li>Do not upload copyrighted songs, ripped YouTube audio, paid packs, or unclear third-party material.</li>
+            <li>If a sample is reported, an admin can review it and remove it from the library.</li>
+          </ul>
+        </div>
+        <div className="dialog-actions">
+          <button className="btn subtle" type="button" onClick={closeLicenseConfirm}>
+            Cancel
+          </button>
+          <button
+            className="btn primary"
+            type="button"
+            onClick={() => {
+              if (pendingUploadFormData) {
+                void handleUpload(pendingUploadFormData);
+              }
+            }}
+          >
+            Confirm and upload
+          </button>
+        </div>
       </Modal>
 
       <Modal

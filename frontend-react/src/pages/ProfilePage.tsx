@@ -21,7 +21,7 @@ export function ProfilePage() {
 
   useEffect(() => {
     if (!user) {
-      navigate("/auth");
+      navigate("/login");
       return;
     }
     void loadProfile(user.id);

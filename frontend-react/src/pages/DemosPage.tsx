@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { deleteOwnComment, fetchComments, fetchDemos, fetchForYou, fetchRatings, fetchTrack, reportComment, reportTrack, saveComment, saveRating, sendCollabRequest, uploadTrack, voteTrack } from "../lib/api";
 import { buildMediaUrl, formatDate, formatDuration } from "../lib/format";
-import { buildTrackUploadFormData } from "../lib/upload";
+import { AUDIO_DURATION_LIMITS_SEC, buildTrackUploadFormData, validateAudioDuration } from "../lib/upload";
 import { INTEREST_OPTIONS, formatInterestLabel } from "../lib/interests";
 import { useAuth } from "../contexts/AuthContext";
 import { usePlayer } from "../contexts/PlayerContext";
@@ -110,11 +110,23 @@ export function DemosPage() {
 
   function openUploadDemo() {
     if (!token) {
-      navigate("/auth");
+      navigate("/login");
       return;
     }
     setUploadOpen(true);
   }
+
+  useEffect(() => {
+    function handleHeaderUpload(event: Event) {
+      const detail = (event as CustomEvent<{ kind?: string }>).detail;
+      if (detail?.kind === "demo") {
+        openUploadDemo();
+      }
+    }
+
+    window.addEventListener("prodcty:open-upload", handleHeaderUpload);
+    return () => window.removeEventListener("prodcty:open-upload", handleHeaderUpload);
+  }, [token]);
 
   async function loadDemos() {
     const result = mode === "top" ? await fetchDemos("upvotes") : await fetchForYou(user?.interests || []);
@@ -155,6 +167,13 @@ export function DemosPage() {
     if (uploadSubmitting) return;
 
     setUploadSubmitting(true);
+    const durationCheck = await validateAudioDuration(uploadFile, "demo");
+    if (!durationCheck.ok) {
+      setUploadMessage(durationCheck.message);
+      setUploadSubmitting(false);
+      return;
+    }
+
     setUploadMessage("Analyzing aura colors...");
     setUploadAuraStatus("analyzing");
     await new Promise((resolve) => window.setTimeout(resolve, AURA_ANALYSIS_DELAY_MS));
@@ -255,7 +274,7 @@ export function DemosPage() {
 
   function openCollab(track: Track) {
     if (!token) {
-      navigate("/auth");
+      navigate("/login");
       return;
     }
     if (track.userId === user?.id) return;
@@ -386,17 +405,7 @@ export function DemosPage() {
   return (
     <main className="page-shell app-shell">
       <section className="app-layout demos-page-layout">
-        <aside className="app-column app-sidebar">
-          <section className="surface-block">
-            <div className="panel-header">
-              <h2>Upload demo</h2>
-              <p className="muted">Share a work-in-progress track for feedback.</p>
-            </div>
-            <button className="btn primary" type="button" onClick={openUploadDemo}>
-              Upload demo
-            </button>
-          </section>
-        </aside>
+        <aside className="app-column app-sidebar" aria-hidden="true"></aside>
 
         <section className="app-column app-main">
           <section className="hero compact app-hero">
@@ -476,6 +485,9 @@ export function DemosPage() {
                         </div>
                       </div>
                       <div className="demo-row-aura">
+                        <button className="btn icon-btn aura-play-btn" onClick={() => void toggleTrack(track)}>
+                          {trackIsPlaying ? "||" : "▶"}
+                        </button>
                         <div
                           className={`aura-strip demo-aura-strip ${trackIsPlaying ? "is-playing" : ""}`}
                           style={
@@ -500,7 +512,7 @@ export function DemosPage() {
                         </div>
                         <div className="meta-line">Uploaded: {formatDate(track.createdAt)}</div>
                       </div>
-                      <div className="library-row-actions compact-actions">
+                      <div className="library-row-actions compact-actions demo-action-bar">
                         <TrackVoteControls
                           trackId={track.id}
                           upvoteCount={track.upvoteCount}
@@ -524,9 +536,6 @@ export function DemosPage() {
                           }}
                         >
                           Report
-                        </button>
-                        <button className="btn icon-btn" onClick={() => void toggleTrack(track)}>
-                          {trackIsPlaying ? "||" : "▶"}
                         </button>
                       </div>
                     </article>
@@ -568,7 +577,9 @@ export function DemosPage() {
             Audio file
             <input type="file" accept="audio/*" required onChange={(event) => setUploadFile(event.target.files?.[0] || null)} />
           </label>
-          <div className="field-hint">{uploadFile ? uploadFile.name : "No demo file selected."}</div>
+          <div className="field-hint">
+            {uploadFile ? uploadFile.name : `No demo file selected. Max length: ${Math.round(AUDIO_DURATION_LIMITS_SEC.demo / 60)} minutes.`}
+          </div>
           <label>
             Title
             <input name="title" placeholder="Summer Tape Demo" required />

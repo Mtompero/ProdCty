@@ -50,7 +50,9 @@ Az Aura színrendszer műfajhoz kötött, élénk palettákat használ. A demo f
 
 ## Komponensek
 
-- felső navigáció aktív route állapottal
+- felső navigáció aktív route állapottal, középen tartott Library / Demos / Admin váltóval
+- headerbe emelt upload gomb, amely az aktuális oldalon sample vagy demo feltöltést indít
+- theme választó több vizuális palettával, a központi navigáció eltolása nélkül
 - globális alkotókereső a fejlécben
 - collab Inbox badge-dzsel, incoming/outgoing kérésekkel, Accept / Decline döntéssel
 - sticky / fixed bottom audio player
@@ -61,6 +63,8 @@ Az Aura színrendszer műfajhoz kötött, élénk palettákat használ. A demo f
 - demo sorok Aura waveformmal, upvote/downvote vezérléssel, Rate, Collab, Report és Play akciókkal
 - profil avatar, saját profil szerkesztés és publikus profilnézet
 - kompakt genre választó chipek maximum három műfaj kijelöléséhez
+- admin AI review lista mini lejátszóval, AI indokkal, Clear AI flag és Review action művelettel
+- admin Review action popup sample törléshez, opcionális warninghoz vagy banhoz
 
 ## Privacy És Biztonsági UX
 

@@ -7,6 +7,39 @@ import { buildMediaUrl, formatDate, formatDuration, formatFileSize, formatTimest
 import { fetchCollabRequests, searchUsers, updateCollabRequest } from "../lib/api";
 import type { CollabRequest, User } from "../types";
 
+const THEMES = [
+  { id: "crimson", label: "Crimson" },
+  { id: "neon", label: "Neon" },
+  { id: "ocean", label: "Ocean" },
+  { id: "gold", label: "Gold" },
+] as const;
+
+type ThemeId = typeof THEMES[number]["id"];
+
+function ThemePicker() {
+  const [theme, setTheme] = useState<ThemeId>(() => {
+    const saved = window.localStorage.getItem("prodcty-theme");
+    return THEMES.some((item) => item.id === saved) ? (saved as ThemeId) : "crimson";
+  });
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem("prodcty-theme", theme);
+  }, [theme]);
+
+  return (
+    <label className="theme-picker" title="Change color theme" aria-label="Theme">
+      <select value={theme} onChange={(event) => setTheme(event.target.value as ThemeId)}>
+        {THEMES.map((item) => (
+          <option key={item.id} value={item.id}>
+            {item.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 function HeaderSearch() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<User[]>([]);
@@ -183,6 +216,34 @@ function CollabInbox() {
   );
 }
 
+function HeaderUploadAction() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isLibrary = location.pathname.startsWith("/library");
+  const isDemos = location.pathname.startsWith("/demos");
+
+  if (!isLibrary && !isDemos) return null;
+
+  const kind = isLibrary ? "sample" : "demo";
+
+  return (
+    <button
+      className="btn primary small header-upload-action"
+      type="button"
+      onClick={() => {
+        if (!user) {
+          navigate("/login");
+          return;
+        }
+        window.dispatchEvent(new CustomEvent("prodcty:open-upload", { detail: { kind } }));
+      }}
+    >
+      Upload {kind}
+    </button>
+  );
+}
+
 function BottomPlayer() {
   const { currentTrack, audioRef, currentTime, duration, updateProgress, setIsPlaying } = usePlayer();
   const info = useMemo(() => {
@@ -241,9 +302,13 @@ export function AppLayout() {
     <div className="app-root">
       <header className="site-header">
         <div className="brand">
-          <span className="dot"></span>
+          <span className="brand-mark">
+            <span className="dot"></span>
+          </span>
           <div>
-            <div className="brand-name">ProdCty</div>
+            <div className="brand-name">
+              ProdCty
+            </div>
             <div className="brand-sub">audio community for producers</div>
           </div>
         </div>
@@ -261,11 +326,18 @@ export function AppLayout() {
           ) : null}
         </nav>
         <div className="header-actions">
+          <HeaderUploadAction />
+          <ThemePicker />
           <HeaderSearch />
           {!user ? (
-            <button className="btn ghost" onClick={() => navigate("/auth")}>
-              Login
-            </button>
+            <>
+              <button className="btn ghost" onClick={() => navigate("/login")}>
+                Login
+              </button>
+              <button className="btn primary small" onClick={() => navigate("/register")}>
+                Sign up
+              </button>
+            </>
           ) : (
             <>
               <CollabInbox />

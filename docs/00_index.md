@@ -38,6 +38,7 @@ Ez az index a szakdolgozati leadandó munkapéldányának belépési pontja. A c
 - Aura generálás tesztek: [backend/tests/analysis.test.js](../backend/tests/analysis.test.js)
 - Jest config: [backend/jest.config.cjs](../backend/jest.config.cjs)
 - React frontend package: [frontend-react/package.json](../frontend-react/package.json)
+- Frontend E2E tesztelési terv: [docs/08_testing/frontend_e2e_plan.md](08_testing/frontend_e2e_plan.md)
 - CI workflow: [.github/workflows/ci.yml](../.github/workflows/ci.yml)
 - JUnit riport: [reports/junit.xml](../reports/junit.xml)
 - Coverage riport: [reports/cobertura-coverage.xml](../reports/cobertura-coverage.xml)
@@ -56,6 +57,13 @@ Frontend build:
 cd frontend-react
 npm install
 npm run build
+```
+
+Frontend lint:
+
+```bash
+cd frontend-react
+npm run lint
 ```
 
 ## AI-használat

@@ -91,6 +91,46 @@ const trackSchema = new mongoose.Schema(
       trim: true,
       maxlength: 60
     },
+    licenseConfirmed: {
+      type: Boolean,
+      default: false,
+      index: true
+    },
+    licenseConfirmedAt: {
+      type: Date,
+      default: null
+    },
+    aiRiskLevel: {
+      type: String,
+      enum: ["clear", "suspicious", "unknown"],
+      default: "unknown",
+      index: true
+    },
+    aiRiskReasons: {
+      type: [String],
+      default: []
+    },
+    aiSuggestedAction: {
+      type: String,
+      enum: ["allow", "manual_review", "unknown"],
+      default: "unknown"
+    },
+    aiAdminNote: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 500
+    },
+    aiRiskSource: {
+      type: String,
+      enum: ["openai", "rule", "disabled", "error", "manual"],
+      default: "disabled",
+      index: true
+    },
+    aiCheckedAt: {
+      type: Date,
+      default: null
+    },
     durationSec: {
       type: Number,
       default: null,

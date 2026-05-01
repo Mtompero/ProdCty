@@ -1,3 +1,8 @@
+export const AUDIO_DURATION_LIMITS_SEC = {
+  sample: 45,
+  demo: 300,
+} as const;
+
 export async function getAudioDuration(file: File) {
   return new Promise<number | "">((resolve) => {
     const url = URL.createObjectURL(file);
@@ -14,6 +19,24 @@ export async function getAudioDuration(file: File) {
     };
     audio.src = url;
   });
+}
+
+export async function validateAudioDuration(file: File, kind: "sample" | "demo") {
+  const durationSec = await getAudioDuration(file);
+  const limitSec = AUDIO_DURATION_LIMITS_SEC[kind];
+
+  if (durationSec && durationSec > limitSec) {
+    return {
+      ok: false,
+      durationSec,
+      message:
+        kind === "sample"
+          ? `Sample uploads are limited to ${limitSec} seconds.`
+          : `Demo uploads are limited to ${Math.round(limitSec / 60)} minutes.`,
+    };
+  }
+
+  return { ok: true, durationSec, message: "" };
 }
 
 export async function buildTrackUploadFormData(

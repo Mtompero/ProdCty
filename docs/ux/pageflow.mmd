@@ -15,6 +15,8 @@ flowchart TB
         K["S11 - Admin Overview"]
         L["S12 - Admin Reports Review"]
         M["S13 - Admin Users Moderation"]
+        N["S14 - Admin AI Review"]
+        O["S15 - Admin AI Review Action"]
     end
 
     A -->|"Login / Register"| B
@@ -41,8 +43,11 @@ flowchart TB
 
     K -->|"Open reports"| L
     K -->|"Users tab"| M
+    K -->|"AI review tab"| N
     L -->|"Reviewed / actioned"| K
     M -->|"Warn / ban / clear"| K
+    N -->|"Review action"| O
+    O -->|"Delete / warn / ban / clear flag"| N
 
     B -->|"Admin nav, admin only"| K
     D -->|"Admin nav, admin only"| K

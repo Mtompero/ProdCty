@@ -22,6 +22,14 @@ export type Track = {
   aura: Aura;
   analysisSource?: string;
   licenseLabel?: string;
+  licenseConfirmed?: boolean;
+  licenseConfirmedAt?: string | null;
+  aiRiskLevel?: "clear" | "suspicious" | "unknown";
+  aiRiskReasons?: string[];
+  aiSuggestedAction?: "allow" | "manual_review" | "unknown";
+  aiAdminNote?: string;
+  aiRiskSource?: "openai" | "rule" | "disabled" | "error" | "manual";
+  aiCheckedAt?: string | null;
   durationSec: number | null;
   originalFileName?: string | null;
   mimeType?: string | null;
@@ -55,6 +63,7 @@ export type AdminOverview = {
   userCount: number;
   sampleCount: number;
   demoCount: number;
+  suspiciousSampleCount?: number;
   commentCount: number;
   ratingCount: number;
   totalPlays: number;

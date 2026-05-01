@@ -35,6 +35,9 @@ CLOUDINARY_API_KEY=<api-key>
 CLOUDINARY_API_SECRET=<api-secret>
 CLOUDINARY_AUDIO_FOLDER=prodcty/audio
 CLOUDINARY_AVATAR_FOLDER=prodcty/avatars
+AI_SAMPLE_SCREENING_ENABLED=auto
+OPENAI_API_KEY=<openai-api-key>
+OPENAI_SAMPLE_RISK_MODEL=gpt-4.1-mini
 ```
 
 Ellenőrzés deploy után:
@@ -77,14 +80,20 @@ Production környezetben, ha a `MEDIA_STORAGE_PROVIDER=cloudinary` és a Cloudin
 4. Lejátszáskor és letöltéskor a frontend közvetlenül a Cloudinary/CDN URL-t használja.
 5. Track vagy felhasználó törlésekor a backend a Cloudinary asset törlését is megkísérli.
 
+## AI sample risk screening
+
+Sample feltöltéskor a backend a feltöltési metaadatok alapján kockázati előszűrést végez. Ha `OPENAI_API_KEY` be van állítva, OpenAI API-val kér strukturált választ. Ha nincs API-kulcs vagy az AI kérés hibázik, a rendszer szabályalapú fallbacket használ, így a feltöltés nem válik törékennyé.
+
+Az AI nem jogi döntést hoz, hanem adminisztrátori review-t támogat. Gyanús jelzések például: YouTube forrás említése, rip/official/stem kifejezések, kereskedelmi előadók vagy harmadik féltől származó sample packok említése. A sample ettől még feltöltődik, de az admin külön `AI review` tabon látja a gyanús sample-öket, mini lejátszóval meghallgathatja őket, majd clear-elheti a flaget, vagy Review action popupból törölheti a sample-t a feltöltő opcionális figyelmeztetésével vagy tiltásával.
+
 ## Publikus bemutatási checklist
 
 - Backend `/health` elérhető.
 - Frontend betölt Vercelen.
 - Regisztráció és login működik.
 - Sample feltöltés után a fájl lejátszható.
+- Sample feltöltés után a jogtisztasági nyilatkozat és az AI risk státusz admin oldalon ellenőrizhető.
 - Demo feltöltés után az Aura waveform megjelenik.
 - Avatar feltöltés után a profilkép publikus profilban is látszik.
 - Feedback, reply, report és collab request működik.
 - Admin felület elérhető admin felhasználóval.
-

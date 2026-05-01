@@ -333,6 +333,14 @@ export async function adminDeleteTrack(token: string, trackId: string) {
   });
 }
 
+export async function clearAdminTrackRisk(token: string, trackId: string) {
+  return request<{ ok: true; track: Track }>(`/admin/tracks/${trackId}/risk`, {
+    method: "PATCH",
+    headers: authHeaders(token, { "Content-Type": "application/json" }),
+    body: JSON.stringify({ action: "clear" }),
+  });
+}
+
 export async function adminDeleteComment(token: string, commentId: string) {
   return request<{ ok: true }>(`/admin/comments/${commentId}`, {
     method: "DELETE",

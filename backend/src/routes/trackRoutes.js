@@ -19,6 +19,7 @@ const {
 } = require("../utils/audioStorage");
 const { analyzeTrackMetadata } = require("../utils/analysis");
 const { jsonError } = require("../utils/http");
+const { screenSampleRisk } = require("../utils/sampleRiskScreening");
 const { trackDto, commentDto } = require("../utils/serializers");
 const {
   isNonEmptyString,
@@ -38,6 +39,10 @@ const audioUpload = createAudioUploadMiddleware();
 const DRUM_TAGS = ["drum", "drums", "kick", "snare", "hihat", "hat", "clap", "rim", "perc", "percussion", "tom", "cymbal", "808"];
 const DEFAULT_PAGE_SIZE = 24;
 const MAX_PAGE_SIZE = 60;
+const AUDIO_DURATION_LIMITS_SEC = {
+  sample: 45,
+  demo: 300,
+};
 
 function multerSingleAudio(req, res, next) {
   audioUpload.single("audio")(req, res, (err) => {
@@ -47,6 +52,21 @@ function multerSingleAudio(req, res, next) {
     }
     return jsonError(res, 400, "VALIDATION_ERROR", err.message || "Audio upload failed.");
   });
+}
+
+function validateTrackDurationLimit(kind, durationSec) {
+  const maxDurationSec = AUDIO_DURATION_LIMITS_SEC[kind] || AUDIO_DURATION_LIMITS_SEC.sample;
+  if (!durationSec || durationSec <= maxDurationSec) {
+    return { ok: true };
+  }
+
+  return {
+    ok: false,
+    message:
+      kind === "sample"
+        ? `Sample uploads are limited to ${maxDurationSec} seconds.`
+        : `Demo uploads are limited to ${Math.round(maxDurationSec / 60)} minutes.`,
+  };
 }
 
 async function rejectBannedUser(req, res) {
@@ -512,6 +532,7 @@ router.post("/tracks", requireAuth, multerSingleAudio, async (req, res) => {
     const bpm = parseOptionalNumber(req.body ? req.body.bpm : null, 1, 400);
     const durationSec = parseDurationSec(req.body ? req.body.durationSec : null);
     const audioCheck = validateUploadedAudioFile(req.file);
+    const durationCheck = validateTrackDurationLimit(kind, durationSec);
 
     if (!isNonEmptyString(title)) {
       await removeStoredFile(req.file && req.file.path);
@@ -520,6 +541,14 @@ router.post("/tracks", requireAuth, multerSingleAudio, async (req, res) => {
     if (!audioCheck.ok) {
       await removeStoredFile(req.file && req.file.path);
       return jsonError(res, 400, "VALIDATION_ERROR", audioCheck.message);
+    }
+    if (!durationCheck.ok) {
+      await removeStoredFile(req.file && req.file.path);
+      return jsonError(res, 400, "VALIDATION_ERROR", durationCheck.message);
+    }
+    if (kind === "sample" && String(req.body ? req.body.licenseConfirmed : "").toLowerCase() !== "true") {
+      await removeStoredFile(req.file && req.file.path);
+      return jsonError(res, 400, "LICENSE_CONFIRMATION_REQUIRED", "Sample uploads require royalty-free rights confirmation.");
     }
 
     const storedAudio = await storeUploadedAudio(req.file);
@@ -535,6 +564,27 @@ router.post("/tracks", requireAuth, multerSingleAudio, async (req, res) => {
     });
 
     const explicitTags = normalizeTags(req.body ? req.body.tags : "");
+    const allTags = [...new Set([...analysis.tags, ...genreTags, ...explicitTags])].slice(0, 20);
+    const riskScreening = kind === "sample"
+      ? await screenSampleRisk({
+        title: title.trim(),
+        originalFileName: storedAudio.originalFileName,
+        description,
+        genre,
+        tags: allTags,
+        drumOrSampleTypeHints: explicitTags,
+        licenseConfirmed: true,
+        username: req.user.username,
+      })
+      : {
+        aiRiskLevel: "unknown",
+        aiRiskReasons: [],
+        aiSuggestedAction: "unknown",
+        aiAdminNote: "AI sample risk screening only applies to library samples.",
+        aiRiskSource: "disabled",
+        aiCheckedAt: null,
+      };
+
     const created = await Track.create({
       userId: req.user.id,
       username: req.user.username,
@@ -542,7 +592,7 @@ router.post("/tracks", requireAuth, multerSingleAudio, async (req, res) => {
       title: title.trim(),
       kind,
       genre,
-      tags: [...new Set([...analysis.tags, ...genreTags, ...explicitTags])].slice(0, 20),
+      tags: allTags,
       description,
       bpm: bpm || analysis.bpm,
       musicalKey: musicalKey || analysis.musicalKey,
@@ -550,6 +600,14 @@ router.post("/tracks", requireAuth, multerSingleAudio, async (req, res) => {
       aura: analysis.aura,
       analysisSource: analysis.analysisSource,
       licenseLabel: "Royalty-free",
+      licenseConfirmed: kind === "sample",
+      licenseConfirmedAt: kind === "sample" ? new Date() : null,
+      aiRiskLevel: riskScreening.aiRiskLevel,
+      aiRiskReasons: riskScreening.aiRiskReasons,
+      aiSuggestedAction: riskScreening.aiSuggestedAction,
+      aiAdminNote: riskScreening.aiAdminNote,
+      aiRiskSource: riskScreening.aiRiskSource,
+      aiCheckedAt: riskScreening.aiCheckedAt,
       durationSec,
       originalFileName: storedAudio.originalFileName,
       mimeType: storedAudio.mimeType,

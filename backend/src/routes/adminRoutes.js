@@ -63,10 +63,11 @@ async function deleteUserUploads(userId) {
 
 router.get("/overview", async (req, res) => {
   try {
-    const [userCount, sampleCount, demoCount, commentCount, ratingCount, openReportCount, playStats] = await Promise.all([
+    const [userCount, sampleCount, demoCount, suspiciousSampleCount, commentCount, ratingCount, openReportCount, playStats] = await Promise.all([
       User.countDocuments({}),
       Track.countDocuments({ kind: "sample" }),
       Track.countDocuments({ kind: "demo" }),
+      Track.countDocuments({ kind: "sample", aiRiskLevel: "suspicious" }),
       Comment.countDocuments({}),
       Rating.countDocuments({}),
       Report.countDocuments({ status: "open" }),
@@ -87,6 +88,7 @@ router.get("/overview", async (req, res) => {
       userCount,
       sampleCount,
       demoCount,
+      suspiciousSampleCount,
       commentCount,
       ratingCount,
       openReportCount,
@@ -285,6 +287,35 @@ router.get("/comments", async (req, res) => {
     return res.json({ items: comments.map(commentDto) });
   } catch (err) {
     return jsonError(res, 500, "INTERNAL_ERROR", "Failed to load comments.");
+  }
+});
+
+router.patch("/tracks/:id/risk", async (req, res) => {
+  try {
+    const action = String((req.body && req.body.action) || "").trim().toLowerCase();
+    if (action !== "clear") {
+      return jsonError(res, 400, "VALIDATION_ERROR", "Risk action is not valid.");
+    }
+
+    const track = await Track.findById(String(req.params.id));
+    if (!track) {
+      return jsonError(res, 404, "TRACK_NOT_FOUND", "Track not found.");
+    }
+    if (track.kind !== "sample") {
+      return jsonError(res, 400, "VALIDATION_ERROR", "AI risk review only applies to samples.");
+    }
+
+    track.aiRiskLevel = "clear";
+    track.aiRiskReasons = [];
+    track.aiSuggestedAction = "allow";
+    track.aiAdminNote = `Cleared manually by ${req.user.username}.`;
+    track.aiRiskSource = "manual";
+    track.aiCheckedAt = new Date();
+    await track.save();
+
+    return res.json({ ok: true, track: trackDto(track) });
+  } catch (err) {
+    return jsonError(res, 500, "INTERNAL_ERROR", "Failed to update AI risk status.");
   }
 });
 

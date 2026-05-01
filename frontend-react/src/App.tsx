@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { PlayerProvider } from "./contexts/PlayerContext";
 import { AppLayout } from "./components/AppLayout";
-import { AuthPage } from "./pages/AuthPage";
+import { LoginPage, RegisterPage } from "./pages/AuthPages";
 import { LibraryPage } from "./pages/LibraryPage";
 import { DemosPage } from "./pages/DemosPage";
 import { ProfilePage } from "./pages/ProfilePage";
@@ -14,7 +14,9 @@ export default function App() {
     <AuthProvider>
       <PlayerProvider>
         <Routes>
-          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/auth" element={<Navigate to="/login" replace />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route element={<AppLayout />}>
             <Route path="/" element={<Navigate to="/library" replace />} />
             <Route path="/library" element={<LibraryPage />} />

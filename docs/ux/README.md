@@ -35,6 +35,8 @@ A jelenlegi frontend React + TypeScript + Vite alapú, a forrása a `frontend-re
 - `S11` - Admin Overview
 - `S12` - Admin Reports Review
 - `S13` - Admin Users Moderation
+- `S14` - Admin AI Review
+- `S15` - Admin AI Review Action
 
 Ajánlott screenshot fájlnevek a `screenshots/` mappában:
 
@@ -51,6 +53,21 @@ Ajánlott screenshot fájlnevek a `screenshots/` mappában:
 - `S11_admin_overview.png`
 - `S12_admin_reports_review.png`
 - `S13_admin_users_moderation.png`
+- `S14_admin_ai_review.png`
+- `S15_admin_ai_review_action.png`
+
+## Frissített screenshotok
+
+A jelenlegi UI állapothoz a meglévő képek mellé elkészültek ezek:
+
+- `S14_admin_ai_review.png` - Admin felület `AI review` tabja, legalább egy gyanús sample-lel, mini lejátszóval, `Review action` és `Clear AI flag` gombbal.
+- `S15_admin_ai_review_action.png` - Az `AI review` tabon a `Review action` popup megnyitva, benne a delete / warn / ban jellegű döntési lehetőségekkel és üzenetmezővel.
+
+Újrakészült képek a legutóbbi felületi változások miatt:
+
+- `S04_demos.png` - új fejléc, upload gomb, Aura waveform és szélesebb action oszlop miatt.
+- `S11_admin_overview.png` - az admin dashboardon már külön `AI review` tab és suspicious sample statisztika is van.
+- `S13_admin_users_moderation.png` - ha a user moderation popup új, középre zárt formként látszik.
 
 ## Beadási állapot
 

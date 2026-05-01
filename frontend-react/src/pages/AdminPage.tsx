@@ -4,6 +4,7 @@ import {
   adminDeleteUser,
   adminDeleteComment,
   adminDeleteTrack,
+  clearAdminTrackRisk,
   fetchAdminComments,
   fetchAdminOverview,
   fetchAdminReports,
@@ -19,12 +20,13 @@ import { Modal } from "../components/Modal";
 import { WaveformPreview } from "../components/WaveformPreview";
 import type { AdminOverview, AdminUser, Comment, Report, Track } from "../types";
 
-type AdminTab = "reports" | "reviewed" | "tracks" | "comments" | "users";
+type AdminTab = "reports" | "reviewed" | "ai-review" | "tracks" | "comments" | "users";
 
 const emptyOverview: AdminOverview = {
   userCount: 0,
   sampleCount: 0,
   demoCount: 0,
+  suspiciousSampleCount: 0,
   commentCount: 0,
   ratingCount: 0,
   totalPlays: 0,
@@ -47,10 +49,13 @@ export function AdminPage() {
   const [reviewMessage, setReviewMessage] = useState("");
   const [moderationUser, setModerationUser] = useState<AdminUser | null>(null);
   const [moderationMessage, setModerationMessage] = useState("");
+  const [aiActionTrack, setAiActionTrack] = useState<Track | null>(null);
+  const [aiActionMessage, setAiActionMessage] = useState("");
 
   const isAdmin = user?.role === "admin";
   const openReports = reports.filter((report) => report.status === "open");
   const reviewedReports = reports.filter((report) => report.status !== "open");
+  const suspiciousSamples = tracks.filter((track) => track.kind === "sample" && track.aiRiskLevel === "suspicious");
 
   async function loadAdminData() {
     if (!token || !isAdmin) return;
@@ -85,6 +90,15 @@ export function AdminPage() {
     }
   }
 
+  async function handleClearTrackRisk(trackId: string) {
+    if (!token) return;
+    const result = await clearAdminTrackRisk(token, trackId);
+    setMessage(result.ok ? "AI risk flag cleared." : result.errorMessage);
+    if (result.ok) {
+      await loadAdminData();
+    }
+  }
+
   async function handleDeleteComment(commentId: string) {
     if (!token || !window.confirm("Delete this comment and its replies?")) return;
     const result = await adminDeleteComment(token, commentId);
@@ -92,6 +106,48 @@ export function AdminPage() {
     if (result.ok) {
       await loadAdminData();
     }
+  }
+
+  async function handleAiReviewSubmit(formData: FormData) {
+    if (!token || !aiActionTrack) return;
+    const action = String(formData.get("action") || "delete") as "delete" | "delete-warn" | "delete-ban";
+    const reason = String(formData.get("reason") || "").trim();
+    const owner = users.find((item) => item.id === aiActionTrack.userId);
+
+    if (action !== "delete" && !reason) {
+      setAiActionMessage("Add a short moderation message for the uploader.");
+      return;
+    }
+
+    const deleteResult = await adminDeleteTrack(token, aiActionTrack.id);
+    if (!deleteResult.ok) {
+      setAiActionMessage(deleteResult.errorMessage);
+      return;
+    }
+
+    if (action !== "delete") {
+      if (!owner) {
+        setAiActionMessage("Sample deleted, but the uploader could not be found for moderation.");
+        await loadAdminData();
+        return;
+      }
+
+      const moderationResult = await updateUserModeration(token, owner.id, {
+        action: action === "delete-ban" ? "ban" : "warn",
+        reason,
+      });
+
+      if (!moderationResult.ok) {
+        setAiActionMessage(`Sample deleted, but moderation failed: ${moderationResult.errorMessage}`);
+        await loadAdminData();
+        return;
+      }
+    }
+
+    setMessage(action === "delete" ? "Suspicious sample deleted." : "Suspicious sample deleted and uploader moderated.");
+    setAiActionTrack(null);
+    setAiActionMessage("");
+    await loadAdminData();
   }
 
   async function openReportReview(report: Report) {
@@ -229,6 +285,7 @@ export function AdminPage() {
         <StatCard label="Users" value={overview.userCount} />
         <StatCard label="Samples" value={overview.sampleCount} />
         <StatCard label="Demos" value={overview.demoCount} />
+        <StatCard label="Suspicious samples" value={overview.suspiciousSampleCount || 0} />
         <StatCard label="Comments" value={overview.commentCount} />
         <StatCard label="Ratings" value={overview.ratingCount} />
         <StatCard label="Plays" value={overview.totalPlays} />
@@ -249,6 +306,9 @@ export function AdminPage() {
             </button>
             <button className={activeTab === "reviewed" ? "active" : ""} onClick={() => setActiveTab("reviewed")}>
               Reviewed
+            </button>
+            <button className={activeTab === "ai-review" ? "active" : ""} onClick={() => setActiveTab("ai-review")}>
+              AI review
             </button>
             <button className={activeTab === "tracks" ? "active" : ""} onClick={() => setActiveTab("tracks")}>
               Tracks
@@ -334,6 +394,54 @@ export function AdminPage() {
           </div>
         ) : null}
 
+        {activeTab === "ai-review" ? (
+          <div className="admin-table ai-review-table">
+            <div className="admin-row ai-review-row admin-row-head">
+              <span>Sample</span>
+              <span>Preview</span>
+              <span>AI reason</span>
+              <span>Stats</span>
+              <span>Uploaded</span>
+              <span>Action</span>
+            </div>
+            {suspiciousSamples.map((track) => (
+              <div className="admin-row ai-review-row" key={track.id}>
+                <span>
+                  <strong>{track.title}</strong>
+                  <small>{track.username} | {track.genre} | {formatFileSize(track.fileSize)}</small>
+                  <small className="ai-risk-badge suspicious">AI risk: suspicious</small>
+                </span>
+                <span>
+                  <AdminInlinePlayer track={track} compact />
+                </span>
+                <span>
+                  {(track.aiRiskReasons && track.aiRiskReasons.length)
+                    ? track.aiRiskReasons.join(" | ")
+                    : track.aiAdminNote || "AI marked this sample for manual review."}
+                </span>
+                <span>{track.playCount} plays | +{track.upvoteCount} / -{track.downvoteCount}</span>
+                <span>{formatDate(track.createdAt)}</span>
+                <span className="admin-action-stack ai-review-actions">
+                  <button
+                    className="btn danger small ai-primary-action"
+                    type="button"
+                    onClick={() => {
+                      setAiActionTrack(track);
+                      setAiActionMessage("");
+                    }}
+                  >
+                    Review action
+                  </button>
+                  <button className="btn ghost small ai-secondary-action" onClick={() => void handleClearTrackRisk(track.id)}>
+                    Clear AI flag
+                  </button>
+                </span>
+              </div>
+            ))}
+            {!suspiciousSamples.length ? <div className="empty-row">No suspicious samples waiting for AI review.</div> : null}
+          </div>
+        ) : null}
+
         {activeTab === "tracks" ? (
           <div className="admin-table">
             <div className="admin-row admin-user-row admin-row-head">
@@ -352,7 +460,7 @@ export function AdminPage() {
                 <span>{track.kind}</span>
                 <span>{track.playCount} plays | +{track.upvoteCount} / -{track.downvoteCount}</span>
                 <span>{formatDate(track.createdAt)}</span>
-                <span>
+                <span className="admin-action-stack">
                   <button className="btn danger small" onClick={() => void handleDeleteTrack(track.id)}>
                     Delete
                   </button>
@@ -488,6 +596,63 @@ export function AdminPage() {
         ) : null}
       </Modal>
       <Modal
+        open={Boolean(aiActionTrack)}
+        panelClassName="moderation-dialog-panel"
+        onClose={() => {
+          setAiActionTrack(null);
+          setAiActionMessage("");
+        }}
+        header={
+          <div className="panel-header row-between">
+            <div>
+              <p className="eyebrow">AI sample review</p>
+              <h2>{aiActionTrack?.title || "Suspicious sample"}</h2>
+              <p className="muted">Delete the flagged sample and optionally moderate the uploader in the same step.</p>
+            </div>
+            <button className="btn ghost" type="button" onClick={() => setAiActionTrack(null)}>
+              Close
+            </button>
+          </div>
+        }
+      >
+        {aiActionTrack ? (
+          <form
+            className="stack-form moderation-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void handleAiReviewSubmit(new FormData(event.currentTarget));
+            }}
+          >
+            <div className="moderation-target-card">
+              <strong>{aiActionTrack.username}</strong>
+              <span>{aiActionTrack.genre} | {formatFileSize(aiActionTrack.fileSize)} | AI risk: suspicious</span>
+              <span>{aiActionTrack.aiRiskReasons?.join(" | ") || aiActionTrack.aiAdminNote || "AI marked this sample for manual review."}</span>
+            </div>
+            <label>
+              Action
+              <select name="action" defaultValue="delete-warn">
+                <option value="delete">Delete sample only</option>
+                <option value="delete-warn">Delete sample + warn uploader</option>
+                <option value="delete-ban">Delete sample + ban uploader</option>
+              </select>
+            </label>
+            <label>
+              Message
+              <textarea
+                name="reason"
+                rows={4}
+                placeholder="Explain the copyright, spam or upload-quality issue to the uploader."
+                defaultValue="The uploaded sample was flagged for possible licensing or source issues. Please upload only original or clearly royalty-free material."
+              />
+            </label>
+            <button className="btn primary" type="submit">
+              Apply review action
+            </button>
+            {aiActionMessage ? <div className="msg err">{aiActionMessage}</div> : null}
+          </form>
+        ) : null}
+      </Modal>
+      <Modal
         open={Boolean(reviewReport)}
         onClose={() => {
           setReviewReport(null);
@@ -618,7 +783,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
   );
 }
 
-function AdminInlinePlayer({ track }: { track: Track }) {
+function AdminInlinePlayer({ track, compact = false }: { track: Track; compact?: boolean }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -664,7 +829,7 @@ function AdminInlinePlayer({ track }: { track: Track }) {
   }
 
   return (
-    <div className={`admin-inline-player ${track.kind === "sample" ? "sample" : "demo"}`}>
+    <div className={`admin-inline-player ${track.kind === "sample" ? "sample" : "demo"} ${compact ? "compact" : ""}`}>
       <audio
         ref={audioRef}
         src={audioSrc}
@@ -680,19 +845,21 @@ function AdminInlinePlayer({ track }: { track: Track }) {
       <span className="admin-inline-time">
         {formatTimestamp(currentTime)} / {duration ? formatDuration(duration) : "--"}
       </span>
-      <span className="admin-inline-key">{track.musicalKey || "--"}</span>
-      <label className="admin-inline-volume">
-        Volume
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value={volume}
-          onChange={(event) => setVolume(Number(event.target.value))}
-        />
-        <span>{Math.round(volume * 100)}%</span>
-      </label>
+      {!compact ? <span className="admin-inline-key">{track.musicalKey || "--"}</span> : null}
+      {!compact ? (
+        <label className="admin-inline-volume">
+          Volume
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            onChange={(event) => setVolume(Number(event.target.value))}
+          />
+          <span>{Math.round(volume * 100)}%</span>
+        </label>
+      ) : null}
     </div>
   );
 }

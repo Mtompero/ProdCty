@@ -9,8 +9,9 @@ A ProdCty egy audiofókuszú közösségi platform producereknek és zenészekne
 - Demo board feltöltéssel, aura-megjelenítéssel, lejátszással és feedback popupbal
 - Collab request funkció demo interakcióknál, fejlécben elérhető inboxszal és Accept / Decline döntéssel
 - Upvote és downvote a sample-ökön és demókon
+- AI-assisted sample risk screening: sample feltöltés után a rendszer OpenAI API-val vagy fallback szabályrendszerrel jelzi a licenc/spam szempontból gyanús metaadatokat az admin felületnek
 - Saját és publikus profilnézet avatarral, bio-val, érdeklődési körökkel és feltöltésekkel
-- Role-alapú admin kezelőfelület moderációs statisztikákkal, sample/demo/komment report elbírálással, felhasználói figyelmeztetéssel / tiltással, felhasználó-törléssel, track és komment törléssel
+- Role-alapú admin kezelőfelület moderációs statisztikákkal, sample/demo/komment report elbírálással, külön AI review listával, mini admin lejátszóval, felhasználói figyelmeztetéssel / tiltással, felhasználó-törléssel, track és komment törléssel
 - GUI/UX dokumentáció, release checklist és MI-használat dokumentáció a `docs/` mappában
 
 ## Tech stack
@@ -62,6 +63,7 @@ Fontosabb változók:
 - `CORS_ORIGIN` - vesszővel elválasztott engedélyezett frontend domainek production környezetben
 - `MEDIA_STORAGE_PROVIDER` - `local` vagy `cloudinary`
 - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` - Cloudinary média storage kulcsok
+- `AI_SAMPLE_SCREENING_ENABLED`, `OPENAI_API_KEY`, `OPENAI_SAMPLE_RISK_MODEL` - opcionális AI-alapú sample risk screening; API-kulcs nélkül szabályalapú fallback működik
 - `VITE_API_URL` - a React frontend production API URL-je Vercelen, például `https://prodcty-api.onrender.com`
 
 ## Quickstart
@@ -162,6 +164,19 @@ npm install
 npm run build
 ```
 
+React frontend lint:
+
+```bash
+cd frontend-react
+npm run lint
+```
+
+Frontend E2E ellenőrzési terv:
+
+```text
+docs/08_testing/frontend_e2e_plan.md
+```
+
 Coverage futtatás:
 
 ```bash
@@ -180,6 +195,7 @@ Fontosabb anyagok:
 - `docs/06_release/final_submission_checklist.md` - beadási ellenőrzőlista
 - `docs/06_release/deployment_guide.md` - Render + Vercel + MongoDB Atlas + Cloudinary online deploy útmutató
 - `docs/07_ai/mesterseges_intelligencia_hasznalata.md` - MI-használat fejezet munkaverziója
+- `docs/08_testing/frontend_e2e_plan.md` - frontend E2E smoke flow és automatizálási terv
 
 ## Ajánlott bemutatási sorrend
 
@@ -188,9 +204,10 @@ Fontosabb anyagok:
 3. Demos: demo feltöltés, aura, saját stílus szerinti és top voted nézet
 4. Demo collab: más felhasználó demójánál collab request küldése, majd a fejléc Inbox panelen elfogadás vagy elutasítás
 5. Feedback popup: 1-5 pontszámos feedback, válaszok, saját komment törlése és demo/komment reportolás
-6. Library report: sample licenc / copyright, spam vagy kéretlen tartalom jelzése
-7. Profil: saját és publikus feltöltések áttekintése
-8. Admin: aktív és lezárt reportok elbírálása, felhasználók figyelmeztetése / tiltása / törlése, feltöltések és kommentek moderációs áttekintése
+6. Admin AI review: gyanúsnak jelölt sample-ek áttekintése, mini lejátszós ellenőrzése, AI flag manuális törlése vagy review action indítása
+7. Library report: sample licenc / copyright, spam vagy kéretlen tartalom jelzése
+8. Profil: saját és publikus feltöltések áttekintése
+9. Admin: aktív és lezárt reportok elbírálása, felhasználók figyelmeztetése / tiltása / törlése, feltöltések és kommentek moderációs áttekintése
 
 ## Ismert korlátok
 

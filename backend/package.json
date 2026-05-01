@@ -5,12 +5,13 @@
   "scripts": {
     "test": "node node_modules/jest/bin/jest.js",
     "test:coverage": "node node_modules/jest/bin/jest.js --coverage",
-    "check:syntax": "node --check src/app.js && node --check src/models/CollabRequest.js && node --check src/models/Report.js && node --check src/routes/authRoutes.js && node --check src/routes/adminRoutes.js && node --check src/routes/collabRoutes.js && node --check src/routes/trackRoutes.js && node --check src/routes/userRoutes.js && node --check src/utils/audioStorage.js && node --check src/utils/mediaStorage.js && node --check src/utils/serializers.js && node --check src/utils/seedAdmin.js",
+    "check:syntax": "node --check src/app.js && node --check src/models/CollabRequest.js && node --check src/models/Report.js && node --check src/routes/authRoutes.js && node --check src/routes/adminRoutes.js && node --check src/routes/collabRoutes.js && node --check src/routes/trackRoutes.js && node --check src/routes/userRoutes.js && node --check src/utils/audioStorage.js && node --check src/utils/mediaStorage.js && node --check src/utils/sampleRiskScreening.js && node --check src/utils/serializers.js && node --check src/utils/seedAdmin.js && node --check src/utils/seedDemoData.js",
+    "seed:demo": "node src/utils/seedDemoData.js",
     "start": "node src/server.js"
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "jest-junit": "^16.0.0",
+    "jest-junit": "^17.0.0",
     "supertest": "^7.1.4"
   },
   "dependencies": {
