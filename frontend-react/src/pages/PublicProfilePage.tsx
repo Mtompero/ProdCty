@@ -12,7 +12,7 @@ const COLLAB_SKILLS = ["vocals", "mixing", "mastering", "guitar", "drums", "beat
 
 export function PublicProfilePage() {
   const { userId = "" } = useParams();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const navigate = useNavigate();
   const { toggleTrack } = usePlayer();
   const [profile, setProfile] = useState<ProfilePayload | null>(null);
@@ -20,11 +20,22 @@ export function PublicProfilePage() {
   const [collabTrackItem, setCollabTrackItem] = useState<Track | null>(null);
   const [collabMessage, setCollabMessage] = useState("");
   const [collabContactPreference, setCollabContactPreference] = useState<"in-app" | "email" | "instagram">("in-app");
+  const isOwnProfile = Boolean(user?.id && (user.id === userId || user.id === profile?.user.id));
 
   useEffect(() => {
     if (!userId) return;
+    if (user?.id === userId) {
+      navigate("/profile", { replace: true });
+      return;
+    }
     void loadProfile(userId);
-  }, [userId]);
+  }, [navigate, user?.id, userId]);
+
+  useEffect(() => {
+    if (profile?.user.id && user?.id === profile.user.id) {
+      navigate("/profile", { replace: true });
+    }
+  }, [navigate, profile?.user.id, user?.id]);
 
   async function loadProfile(targetUserId: string) {
     const result = await fetchProfile(targetUserId);
@@ -136,7 +147,7 @@ export function PublicProfilePage() {
               items={profile.demos}
               onPlay={(track) => void toggleTrack(track)}
               onVote={(trackId, value) => void handleVote(trackId, value)}
-              onCollab={openCollab}
+              onCollab={isOwnProfile ? undefined : openCollab}
             />
           </section>
         </section>
