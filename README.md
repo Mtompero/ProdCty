@@ -2,6 +2,16 @@
 
 A ProdCty egy audiofókuszú közösségi platform producereknek és zenészeknek. A felhasználók sample-eket és demókat tölthetnek fel, lejátszhatják egymás anyagait, szavazhatnak rájuk, valamint demókhoz értékelést és szöveges visszajelzést adhatnak.
 
+## Éles alkalmazás
+
+A projekt elsődlegesen online kipróbálásra készült. Az alkalmazás belépési pontja:
+
+```text
+https://prod-cty.vercel.app/#/login
+```
+
+Az online verzió Vercelen futó React frontendből, Renderen futó Express backendből, MongoDB Atlas adatbázisból és Cloudinary médiafájl-tárolásból áll. A lokális futtatás főleg fejlesztéshez, teszteléshez és hibakereséshez hasznos.
+
 ## Fő funkciók
 
 - Regisztráció és bejelentkezés JWT-alapú munkamenettel
@@ -32,7 +42,7 @@ A ProdCty egy audiofókuszú közösségi platform producereknek és zenészekne
 - `sprints/` - korábbi sprintanyagok és specifikációk
 - `reports/` - teszt- és coverage riportok
 
-## Előkövetelmények
+## Helyi fejlesztési előkövetelmények
 
 - Node.js 20 vagy újabb
 - npm
@@ -40,7 +50,7 @@ A ProdCty egy audiofókuszú közösségi platform producereknek és zenészekne
 
 ## Konfiguráció
 
-Másold le a példakonfigurációt:
+Az éles környezetben a szükséges környezeti változók Renderen és Vercelen vannak beállítva. Helyi fejlesztéshez másold le a példakonfigurációt:
 
 ```powershell
 copy .env.example backend\.env
@@ -68,13 +78,29 @@ Fontosabb változók:
 
 ## Quickstart
 
-### Gyors indítás Windows alatt
+### Online kipróbálás
 
-Ha Windows alatt szeretnéd a legegyszerűbben elindítani a projektet:
+Nyisd meg az éles alkalmazást:
 
-1. Ellenőrizd, hogy fut-e a MongoDB.
+```text
+https://prod-cty.vercel.app/#/login
+```
+
+Ajánlott kipróbálási sorrend:
+
+1. Regisztrálj vagy jelentkezz be.
+2. Próbáld ki a Library nézetet: sample keresés, szűrés, lejátszás és letöltés.
+3. Próbáld ki a Demos nézetet: demo lejátszás, aura waveform, értékelés, komment, collab request.
+4. Nézd meg a saját és publikus profilnézeteket.
+5. Admin funkciókhoz admin jogosultságú felhasználó szükséges.
+
+### Helyi futtatás Windows alatt
+
+Ha fejlesztéshez vagy teszteléshez helyben szeretnéd elindítani a projektet:
+
+1. Ellenőrizd, hogy fut-e a MongoDB, vagy legyen beállítva elérhető `MONGO_URI`.
 2. Kattints duplán a projekt gyökerében lévő `start-prodcty.bat` fájlra.
-3. Nyisd meg a frontendet:
+3. A script automatikusan megnyitja a helyi frontendet, vagy kézzel itt érhető el:
 
 ```text
 http://127.0.0.1:4173
@@ -82,7 +108,7 @@ http://127.0.0.1:4173
 
 A script külön ablakban indítja a backendet és a React frontendet, közben visszajelzést ad arról, hogy vár a frontend szerverre. Amikor a frontend elérhető, automatikusan megnyitja a böngészőben. Ha valamelyik oldalon hiányzik a `node_modules`, automatikusan lefuttatja az `npm install` parancsot. Ha még nincs `backend/.env`, a `.env.example` alapján létrehozza.
 
-### Manuális indítás
+### Manuális helyi indítás
 
 Backend indítása:
 
@@ -125,12 +151,7 @@ Alapértelmezett helyi URL:
 http://127.0.0.1:4173
 ```
 
-Ajánlott kipróbálási sorrend:
-
-1. Nyisd meg az auth nézetet és regisztrálj egy felhasználót.
-2. Jelentkezz be.
-3. Próbáld ki a Library, Demos, Profile és publikus profile nézeteket.
-4. Admin funkciókhoz jelentkezz be a demo adminnal:
+Lokális admin kipróbáláshoz a fejlesztői környezetben beállított admin felhasználóval lehet belépni. Alapértelmezett fejlesztői példa:
 
 ```text
 email: admin@admin.com
@@ -191,7 +212,7 @@ A dokumentáció belépési pontja: `docs/00_index.md`
 Fontosabb anyagok:
 
 - `docs/ux/` - GUI/UX dokumentáció, screenshotok, pageflow, journey-k
-- `docs/thesis/Tompa_Marton_ProdCty_szakdolgozat.docx` - szakdolgozat munkapéldány
+- `docs/thesis/Tompa_Marton_ProdCty_szakdolgozat.pdf` - szakdolgozat első teljes PDF-verziója
 - `docs/06_release/final_submission_checklist.md` - beadási ellenőrzőlista
 - `docs/06_release/deployment_guide.md` - Render + Vercel + MongoDB Atlas + Cloudinary online deploy útmutató
 - `docs/07_ai/mesterseges_intelligencia_hasznalata.md` - MI-használat fejezet munkaverziója
