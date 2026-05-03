@@ -64,6 +64,10 @@ function clearFailedAttempts(req) {
   authAttempts.delete(getClientKey(req));
 }
 
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 router.post("/register", async (req, res) => {
   try {
     if (isRateLimited(req)) {
@@ -94,7 +98,9 @@ router.post("/register", async (req, res) => {
       return jsonError(res, 409, "EMAIL_TAKEN", "This email is already registered.");
     }
 
-    const usernameExists = await User.findOne({ username: usernameNorm }).lean();
+    const usernameExists = await User.findOne({
+      username: { $regex: `^${escapeRegExp(usernameNorm)}$`, $options: "i" },
+    }).lean();
     if (usernameExists) {
       recordFailedAttempt(req);
       return jsonError(res, 409, "USERNAME_TAKEN", "This username is already taken.");

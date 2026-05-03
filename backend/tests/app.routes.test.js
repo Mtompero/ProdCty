@@ -207,6 +207,57 @@ describe("app routes", () => {
     expect(response.body.error.message).toContain("at least 8");
   });
 
+  test("register rejects a duplicate username", async () => {
+    User.findOne
+      .mockReturnValueOnce({ lean: jest.fn().mockResolvedValue(null) })
+      .mockReturnValueOnce({
+        lean: jest.fn().mockResolvedValue({
+          _id: "u-existing",
+          username: "garazsjozsi",
+        }),
+      });
+
+    const app = createApp();
+    const response = await request(app)
+      .post("/auth/register")
+      .send({
+        username: "garazsjozsi",
+        email: "new@example.com",
+        password: "strongpass123",
+      });
+
+    expect(response.status).toBe(409);
+    expect(response.body.error.code).toBe("USERNAME_TAKEN");
+    expect(User.create).not.toHaveBeenCalled();
+  });
+
+  test("register rejects a duplicate username with different casing", async () => {
+    User.findOne
+      .mockReturnValueOnce({ lean: jest.fn().mockResolvedValue(null) })
+      .mockReturnValueOnce({
+        lean: jest.fn().mockResolvedValue({
+          _id: "u-existing",
+          username: "GarazsJozsi",
+        }),
+      });
+
+    const app = createApp();
+    const response = await request(app)
+      .post("/auth/register")
+      .send({
+        username: "garazsjozsi",
+        email: "new@example.com",
+        password: "strongpass123",
+      });
+
+    expect(response.status).toBe(409);
+    expect(response.body.error.code).toBe("USERNAME_TAKEN");
+    expect(User.findOne).toHaveBeenNthCalledWith(2, {
+      username: { $regex: "^garazsjozsi$", $options: "i" },
+    });
+    expect(User.create).not.toHaveBeenCalled();
+  });
+
   test("demos endpoint returns paginated payload", async () => {
     Track.countDocuments.mockResolvedValueOnce(1);
     Track.find.mockReturnValueOnce(chainableFind([

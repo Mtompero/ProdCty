@@ -1,45 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="19" failures="0" errors="0" time="6.44">
-  <testsuite name="app routes" errors="0" failures="0" skipped="0" timestamp="2026-05-01T14:29:28" time="5.612" tests="9">
-    <testcase classname="app routes public user search omits email addresses" name="app routes public user search omits email addresses" time="0.023">
+<testsuites name="jest tests" tests="23" failures="0" errors="0" time="5.528">
+  <testsuite name="app routes" errors="0" failures="0" skipped="0" timestamp="2026-05-03T16:47:44" time="5.083" tests="13">
+    <testcase classname="app routes public user search omits email addresses" name="app routes public user search omits email addresses" time="0.013">
     </testcase>
-    <testcase classname="app routes current user endpoint still returns private email data" name="app routes current user endpoint still returns private email data" time="0.013">
+    <testcase classname="app routes current user endpoint still returns private email data" name="app routes current user endpoint still returns private email data" time="0.004">
     </testcase>
-    <testcase classname="app routes track detail no longer increments play count" name="app routes track detail no longer increments play count" time="0.004">
+    <testcase classname="app routes track detail no longer increments play count" name="app routes track detail no longer increments play count" time="0.002">
     </testcase>
-    <testcase classname="app routes play endpoint increments play count explicitly" name="app routes play endpoint increments play count explicitly" time="0.004">
+    <testcase classname="app routes play endpoint increments play count explicitly" name="app routes play endpoint increments play count explicitly" time="0.003">
     </testcase>
-    <testcase classname="app routes register enforces stronger password validation" name="app routes register enforces stronger password validation" time="0.062">
+    <testcase classname="app routes register enforces stronger password validation" name="app routes register enforces stronger password validation" time="0.068">
     </testcase>
-    <testcase classname="app routes demos endpoint returns paginated payload" name="app routes demos endpoint returns paginated payload" time="0.005">
+    <testcase classname="app routes register rejects a duplicate username" name="app routes register rejects a duplicate username" time="0.003">
     </testcase>
-    <testcase classname="app routes admin overview rejects a non-admin token" name="app routes admin overview rejects a non-admin token" time="0.003">
+    <testcase classname="app routes register rejects a duplicate username with different casing" name="app routes register rejects a duplicate username with different casing" time="0.003">
     </testcase>
-    <testcase classname="app routes admin overview returns moderation statistics for admins" name="app routes admin overview returns moderation statistics for admins" time="0.004">
+    <testcase classname="app routes demos endpoint returns paginated payload" name="app routes demos endpoint returns paginated payload" time="0.003">
     </testcase>
-    <testcase classname="app routes second admin warning automatically bans the user" name="app routes second admin warning automatically bans the user" time="0.004">
+    <testcase classname="app routes admin overview rejects a non-admin token" name="app routes admin overview rejects a non-admin token" time="0.002">
+    </testcase>
+    <testcase classname="app routes admin overview returns moderation statistics for admins" name="app routes admin overview returns moderation statistics for admins" time="0.003">
+    </testcase>
+    <testcase classname="app routes second admin warning automatically bans the user" name="app routes second admin warning automatically bans the user" time="0.002">
+    </testcase>
+    <testcase classname="app routes admin moderation rejects self moderation before loading a user" name="app routes admin moderation rejects self moderation before loading a user" time="0.002">
+    </testcase>
+    <testcase classname="app routes admin moderation rejects other admin accounts" name="app routes admin moderation rejects other admin accounts" time="0.002">
     </testcase>
   </testsuite>
-  <testsuite name="trackService" errors="0" failures="0" skipped="0" timestamp="2026-05-01T14:29:34" time="0.055" tests="6">
-    <testcase classname="trackService valid track passes validation" name="trackService valid track passes validation" time="0.001">
+  <testsuite name="trackService" errors="0" failures="0" skipped="0" timestamp="2026-05-03T16:47:49" time="0.068" tests="6">
+    <testcase classname="trackService valid track passes validation" name="trackService valid track passes validation" time="0">
     </testcase>
     <testcase classname="trackService track with empty title is invalid" name="trackService track with empty title is invalid" time="0">
     </testcase>
     <testcase classname="trackService track with non-positive length is invalid" name="trackService track with non-positive length is invalid" time="0">
     </testcase>
-    <testcase classname="trackService addTrack adds a new track with id" name="trackService addTrack adds a new track with id" time="0">
+    <testcase classname="trackService addTrack adds a new track with id" name="trackService addTrack adds a new track with id" time="0.001">
     </testcase>
-    <testcase classname="trackService addTrack throws on invalid track" name="trackService addTrack throws on invalid track" time="0.007">
+    <testcase classname="trackService addTrack throws on invalid track" name="trackService addTrack throws on invalid track" time="0.011">
     </testcase>
     <testcase classname="trackService filterByGenre returns only matching tracks" name="trackService filterByGenre returns only matching tracks" time="0">
     </testcase>
   </testsuite>
-  <testsuite name="audio aura generation" errors="0" failures="0" skipped="0" timestamp="2026-05-01T14:29:34" time="0.038" tests="4">
+  <testsuite name="audio aura generation" errors="0" failures="0" skipped="0" timestamp="2026-05-03T16:47:49" time="0.028" tests="4">
     <testcase classname="audio aura generation metal demos with high energy produce an intense aura" name="audio aura generation metal demos with high energy produce an intense aura" time="0.001">
     </testcase>
-    <testcase classname="audio aura generation same genre demos still get different aura palettes" name="audio aura generation same genre demos still get different aura palettes" time="0.001">
+    <testcase classname="audio aura generation same genre demos still get different aura palettes" name="audio aura generation same genre demos still get different aura palettes" time="0">
     </testcase>
-    <testcase classname="audio aura generation metadata analysis does not guess bpm when it is not explicit" name="audio aura generation metadata analysis does not guess bpm when it is not explicit" time="0">
+    <testcase classname="audio aura generation metadata analysis does not guess bpm when it is not explicit" name="audio aura generation metadata analysis does not guess bpm when it is not explicit" time="0.001">
     </testcase>
     <testcase classname="audio aura generation metadata analysis keeps explicit bpm from the filename" name="audio aura generation metadata analysis keeps explicit bpm from the filename" time="0">
     </testcase>
