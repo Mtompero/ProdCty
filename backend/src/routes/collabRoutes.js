@@ -37,6 +37,9 @@ function collabRequestDto(item, viewerId) {
   const isRequester = item.requesterId === viewerId;
   const isAccepted = item.status === "accepted";
   const visibleInstagramHandle = isRequester || isAccepted ? item.instagramHandle || "" : "";
+  const visibleRequesterEmail = item.contactPreference === "email" && (isRequester || isAccepted)
+    ? item.requesterEmail || ""
+    : "";
   return {
     id: item._id.toString(),
     trackId: item.trackId.toString(),
@@ -49,6 +52,8 @@ function collabRequestDto(item, viewerId) {
     message: item.message,
     skills: item.skills || [],
     contactPreference: item.contactPreference || "in-app",
+    requesterEmail: visibleRequesterEmail,
+    emailVisible: Boolean(visibleRequesterEmail),
     instagramHandle: visibleInstagramHandle,
     instagramVisible: Boolean(visibleInstagramHandle),
     status: item.status,
@@ -112,6 +117,7 @@ router.post("/tracks/:trackId/collab-requests", requireAuth, async (req, res) =>
         requesterId: req.user.id,
         requesterUsername: req.user.username,
         requesterAvatarUrl: req.user.avatarUrl || "",
+        requesterEmail: req.user.email || "",
         message,
         skills,
         contactPreference,

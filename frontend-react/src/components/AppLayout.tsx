@@ -188,7 +188,11 @@ function CollabInbox() {
                       "Instagram will unlock after acceptance."
                     )
                   ) : item.contactPreference === "email" ? (
-                    "Email allowed after acceptance."
+                    item.emailVisible && item.requesterEmail ? (
+                      <a href={`mailto:${item.requesterEmail}`}>Email: {item.requesterEmail}</a>
+                    ) : (
+                      "Email will unlock after acceptance."
+                    )
                   ) : (
                     "In-app first."
                   )}

@@ -41,6 +41,13 @@ const collabRequestSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    requesterEmail: {
+      type: String,
+      default: "",
+      trim: true,
+      lowercase: true,
+      maxlength: 120,
+    },
     message: {
       type: String,
       required: true,

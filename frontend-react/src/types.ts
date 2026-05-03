@@ -172,6 +172,8 @@ export type CollabRequest = {
   message: string;
   skills: string[];
   contactPreference: "in-app" | "email" | "instagram";
+  requesterEmail?: string;
+  emailVisible?: boolean;
   instagramHandle?: string;
   instagramVisible?: boolean;
   status: "pending" | "accepted" | "declined";
