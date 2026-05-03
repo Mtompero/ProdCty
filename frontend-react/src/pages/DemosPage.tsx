@@ -214,6 +214,10 @@ export function DemosPage() {
       setFeedbackMessage("Choose a demo and log in first.");
       return;
     }
+    if (selectedTrack.userId === user?.id) {
+      setFeedbackMessage("You cannot rate your own demo.");
+      return;
+    }
 
     const result = await saveRating(token, selectedTrack.id, {
       score: Number(formData.get("score") || 5),
@@ -519,24 +523,28 @@ export function DemosPage() {
                           downvoteCount={track.downvoteCount}
                           onVote={(value) => void handleVote(track.id, value)}
                         />
-                        <button className="btn primary" onClick={() => void openFeedback(track.id)}>
-                          Rate
-                        </button>
+                        {track.userId !== user?.id ? (
+                          <button className="btn primary" onClick={() => void openFeedback(track.id)}>
+                            Rate
+                          </button>
+                        ) : null}
                         {track.userId !== user?.id ? (
                           <button className="btn ghost small" onClick={() => openCollab(track)}>
                             Collab
                           </button>
                         ) : null}
-                        <button
-                          className="btn ghost small"
-                          onClick={() => {
-                            setReportTrackItem(track);
-                            setReportMessage("");
-                            setReportOpen(true);
-                          }}
-                        >
-                          Report
-                        </button>
+                        {track.userId !== user?.id ? (
+                          <button
+                            className="btn ghost small"
+                            onClick={() => {
+                              setReportTrackItem(track);
+                              setReportMessage("");
+                              setReportOpen(true);
+                            }}
+                          >
+                            Report
+                          </button>
+                        ) : null}
                       </div>
                     </article>
                   );
@@ -825,36 +833,45 @@ export function DemosPage() {
 
         <div className="feedback-dialog-grid">
           <section className="surface-block feedback-form-panel">
-            <div className="panel-header">
-              <h2>Rate demo</h2>
-              <p className="muted">Choose a score and add one clear feedback note.</p>
-            </div>
-            <form
-              className="stack-form"
-              onSubmit={(event) => {
-                event.preventDefault();
-                void handleRating(new FormData(event.currentTarget));
-              }}
-            >
-              <div className="field-group">
-                <span className="field-label">Score</span>
-                <div className="score-grid">
-                  {[1, 2, 3, 4, 5].map((value) => (
-                    <label key={value}>
-                      <input type="radio" name="score" value={value} defaultChecked={value === 5} />
-                      <span>{value}</span>
-                    </label>
-                  ))}
+            {selectedTrack?.userId !== user?.id ? (
+              <>
+                <div className="panel-header">
+                  <h2>Rate demo</h2>
+                  <p className="muted">Choose a score and add one clear feedback note.</p>
                 </div>
+                <form
+                  className="stack-form"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    void handleRating(new FormData(event.currentTarget));
+                  }}
+                >
+                  <div className="field-group">
+                    <span className="field-label">Score</span>
+                    <div className="score-grid">
+                      {[1, 2, 3, 4, 5].map((value) => (
+                        <label key={value}>
+                          <input type="radio" name="score" value={value} defaultChecked={value === 5} />
+                          <span>{value}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <label>
+                    Feedback
+                    <textarea name="text" rows={4} placeholder="Great mood overall, but the top end could open up more." />
+                  </label>
+                  <button className="btn primary" type="submit">
+                    Save feedback
+                  </button>
+                </form>
+              </>
+            ) : (
+              <div className="panel-header">
+                <h2>Own demo</h2>
+                <p className="muted">You can read feedback here, but you cannot rate your own demo.</p>
               </div>
-              <label>
-                Feedback
-                <textarea name="text" rows={4} placeholder="Great mood overall, but the top end could open up more." />
-              </label>
-              <button className="btn primary" type="submit">
-                Save feedback
-              </button>
-            </form>
+            )}
 
             {replyTarget ? (
               <>

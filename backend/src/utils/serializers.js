@@ -55,7 +55,7 @@ function trackDto(track) {
     mimeType: track.mimeType || null,
     fileSize: track.fileSize || null,
     audioUrl,
-    downloadUrl: track.kind === "sample" ? (isCloudMedia ? track.audioUrl : `/tracks/${id}/download`) : null,
+    downloadUrl: track.kind === "sample" ? `/tracks/${id}/download` : null,
     isDownloadable: track.kind === "sample",
     ratingAverage: Number(track.ratingAverage || 0),
     ratingCount: Number(track.ratingCount || 0),

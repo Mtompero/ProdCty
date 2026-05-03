@@ -3,6 +3,7 @@
 const express = require("express");
 const fs = require("fs");
 const mongoose = require("mongoose");
+const { Readable } = require("stream");
 
 const requireAuth = require("../../middleware/requireAuth");
 const CollabRequest = require("../models/CollabRequest");
@@ -389,12 +390,27 @@ router.get("/tracks/:id/download", async (req, res) => {
     if (track.kind !== "sample") {
       return jsonError(res, 403, "FORBIDDEN", "Demo tracks cannot be downloaded.");
     }
+    const downloadName = String(track.originalFileName || `${track.title || "sample"}.mp3`).replace(/["\r\n]/g, "");
     if (track.storageProvider === "cloudinary" && track.audioUrl) {
-      res.setHeader("Content-Disposition", `attachment; filename="${String(track.originalFileName || "sample").replace(/"/g, "")}"`);
-      return res.redirect(track.audioUrl);
+      const upstream = await fetch(track.audioUrl);
+      if (!upstream.ok || !upstream.body) {
+        return jsonError(res, 502, "DOWNLOAD_UNAVAILABLE", "Failed to fetch stored audio.");
+      }
+
+      res.setHeader("Content-Type", upstream.headers.get("content-type") || track.mimeType || "application/octet-stream");
+      const contentLength = upstream.headers.get("content-length");
+      if (contentLength) {
+        res.setHeader("Content-Length", contentLength);
+      }
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${downloadName}"; filename*=UTF-8''${encodeURIComponent(downloadName)}`
+      );
+      res.setHeader("Cache-Control", "no-store");
+      return Readable.fromWeb(upstream.body).pipe(res);
     }
 
-    return res.download(track.storagePath, track.originalFileName);
+    return res.download(track.storagePath, downloadName);
   } catch (err) {
     return jsonError(res, 500, "INTERNAL_ERROR", "Failed to download track.");
   }
@@ -487,7 +503,7 @@ router.post("/tracks/:id/reports", requireAuth, async (req, res) => {
     if (!track) {
       return jsonError(res, 404, "TRACK_NOT_FOUND", "Track not found.");
     }
-    if (track.userId === req.user.id) {
+    if (String(track.userId) === String(req.user.id)) {
       return jsonError(res, 400, "VALIDATION_ERROR", "You cannot report your own upload.");
     }
 
@@ -853,6 +869,9 @@ router.post("/tracks/:trackId/ratings", requireAuth, async (req, res) => {
     }
     if (track.kind !== "demo") {
       return jsonError(res, 400, "VALIDATION_ERROR", "Ratings are only available for demo tracks.");
+    }
+    if (String(track.userId) === String(req.user.id)) {
+      return jsonError(res, 400, "VALIDATION_ERROR", "You cannot rate your own demo.");
     }
     if (!scoreCheck.ok) {
       return jsonError(res, 400, "VALIDATION_ERROR", scoreCheck.message);

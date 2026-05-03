@@ -48,7 +48,7 @@ const BASE_SEARCH_SUGGESTIONS = [
 ];
 
 export function LibraryPage() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const navigate = useNavigate();
   const { currentTrack, isPlaying, toggleTrack } = usePlayer();
   const [samples, setSamples] = useState<Track[]>([]);
@@ -457,17 +457,19 @@ export function LibraryPage() {
                           Download
                         </a>
                       ) : null}
-                      <button
-                        className="btn ghost small"
-                        type="button"
-                        onClick={() => {
-                          setReportTrackItem(track);
-                          setReportMessage("");
-                          setReportOpen(true);
-                        }}
-                      >
-                        Report
-                      </button>
+                      {track.userId !== user?.id ? (
+                        <button
+                          className="btn ghost small"
+                          type="button"
+                          onClick={() => {
+                            setReportTrackItem(track);
+                            setReportMessage("");
+                            setReportOpen(true);
+                          }}
+                        >
+                          Report
+                        </button>
+                      ) : null}
                     </div>
                   </article>
                   );

@@ -348,7 +348,13 @@ export function AppLayout() {
                   alt="Profile avatar"
                 />
               </NavLink>
-              <button className="btn small" onClick={logout}>
+              <button
+                className="btn small"
+                onClick={() => {
+                  logout();
+                  navigate("/login");
+                }}
+              >
                 Logout
               </button>
             </>

@@ -287,6 +287,36 @@ describe("app routes", () => {
     expect(response.body.meta).toMatchObject({ total: 1, page: 1, limit: 12, pages: 1 });
   });
 
+  test("rating endpoint rejects the owner's own demo", async () => {
+    const token = jwt.sign(
+      { sub: "u1", username: "garazsjozsi", email: "garazs@example.com", role: "user" },
+      process.env.JWT_SECRET
+    );
+    User.findById.mockReturnValueOnce({
+      select: jest.fn().mockReturnThis(),
+      lean: jest.fn().mockResolvedValue({ moderationStatus: "active" }),
+    });
+    Track.findById.mockReturnValueOnce({
+      lean: jest.fn().mockResolvedValue({
+        _id: "507f191e810c19729de860ea",
+        userId: "u1",
+        username: "garazsjozsi",
+        title: "Pingpong",
+        kind: "demo",
+      }),
+    });
+
+    const app = createApp();
+    const response = await request(app)
+      .post("/tracks/507f191e810c19729de860ea/ratings")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ score: 5, text: "nice" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.message).toContain("your own demo");
+    expect(Rating.findOneAndUpdate).not.toHaveBeenCalled();
+  });
+
   test("admin overview rejects a non-admin token", async () => {
     const token = jwt.sign(
       { sub: "u1", username: "listener", email: "listener@example.com", role: "user" },
