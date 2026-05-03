@@ -510,6 +510,11 @@ select {
   gap: 8px;
 }
 
+.check-chip {
+  position: relative;
+  display: inline-flex;
+}
+
 .check-chip input {
   position: absolute;
   opacity: 0;
@@ -519,19 +524,47 @@ select {
 .check-chip span {
   display: inline-flex;
   align-items: center;
+  gap: 8px;
   min-height: 34px;
-  padding: 7px 12px;
+  padding: 7px 13px 7px 10px;
   border: 1px solid rgba(255, 82, 82, 0.22);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.035);
   color: rgba(255, 255, 255, 0.86);
   cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.check-chip span::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.16);
 }
 
 .check-chip input:checked + span {
-  border-color: rgba(255, 45, 45, 0.72);
-  background: rgba(255, 45, 45, 0.18);
+  border-color: rgba(var(--accent-rgb), 0.74);
+  background: rgba(var(--accent-rgb), 0.18);
   color: #fff;
+}
+
+.check-chip input:checked + span::before {
+  border-color: rgba(var(--accent-rgb), 0.9);
+  background: var(--accent);
+  box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.18);
+}
+
+.check-chip input:focus-visible + span {
+  outline: 2px solid rgba(var(--accent-rgb), 0.45);
+  outline-offset: 2px;
+}
+
+.check-chip:hover span {
+  border-color: rgba(var(--accent-rgb), 0.48);
+  transform: translateY(-1px);
 }
 
 .collab-inbox {

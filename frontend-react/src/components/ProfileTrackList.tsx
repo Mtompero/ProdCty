@@ -12,6 +12,7 @@ type ProfileTrackListProps = {
   onPlay: (track: Track) => void;
   onDelete?: (trackId: string) => void;
   onVote: (trackId: string, value: 1 | -1) => void;
+  onCollab?: (track: Track) => void;
 };
 
 export function ProfileTrackList({
@@ -20,6 +21,7 @@ export function ProfileTrackList({
   onPlay,
   onDelete,
   onVote,
+  onCollab,
 }: ProfileTrackListProps) {
   const { currentTrack, isPlaying } = usePlayer();
 
@@ -90,6 +92,11 @@ export function ProfileTrackList({
               <button className="btn primary icon-btn" type="button" onClick={() => onPlay(track)} aria-label={trackIsPlaying ? "Pause upload" : "Play upload"}>
                 {trackIsPlaying ? "||" : ">"}
               </button>
+              {isDemo && onCollab ? (
+                <button className="btn ghost" type="button" onClick={() => onCollab(track)}>
+                  Collab
+                </button>
+              ) : null}
               {track.downloadUrl ? (
                 <a className="btn ghost" href={buildApiUrl(track.downloadUrl)}>
                   Download

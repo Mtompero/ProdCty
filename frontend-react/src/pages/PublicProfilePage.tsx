@@ -1,17 +1,25 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { fetchProfile, voteTrack } from "../lib/api";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchProfile, sendCollabRequest, voteTrack } from "../lib/api";
 import { buildMediaUrl } from "../lib/format";
 import { useAuth } from "../contexts/AuthContext";
 import { usePlayer } from "../contexts/PlayerContext";
 import { ProfileTrackList } from "../components/ProfileTrackList";
-import type { ProfilePayload } from "../types";
+import { Modal } from "../components/Modal";
+import type { ProfilePayload, Track } from "../types";
+
+const COLLAB_SKILLS = ["vocals", "mixing", "mastering", "guitar", "drums", "beat", "production", "songwriting", "other"];
 
 export function PublicProfilePage() {
   const { userId = "" } = useParams();
   const { token } = useAuth();
+  const navigate = useNavigate();
   const { toggleTrack } = usePlayer();
   const [profile, setProfile] = useState<ProfilePayload | null>(null);
+  const [collabOpen, setCollabOpen] = useState(false);
+  const [collabTrackItem, setCollabTrackItem] = useState<Track | null>(null);
+  const [collabMessage, setCollabMessage] = useState("");
+  const [collabContactPreference, setCollabContactPreference] = useState<"in-app" | "email" | "instagram">("in-app");
 
   useEffect(() => {
     if (!userId) return;
@@ -30,6 +38,47 @@ export function PublicProfilePage() {
     }
     await voteTrack(token, trackId, value);
     await loadProfile(userId);
+  }
+
+  function openCollab(track: Track) {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    setCollabTrackItem(track);
+    setCollabMessage("");
+    setCollabContactPreference("in-app");
+    setCollabOpen(true);
+  }
+
+  async function handleCollabRequest(formData: FormData) {
+    if (!token || !collabTrackItem) {
+      setCollabMessage("Choose a demo and log in first.");
+      return;
+    }
+
+    const result = await sendCollabRequest(token, collabTrackItem.id, {
+      message: String(formData.get("message") || ""),
+      skills: formData.getAll("skills").map((item) => String(item)),
+      contactPreference: String(formData.get("contactPreference") || "in-app") === "instagram"
+        ? "instagram"
+        : String(formData.get("contactPreference") || "in-app") === "email"
+          ? "email"
+          : "in-app",
+      instagramHandle: String(formData.get("instagramHandle") || ""),
+    });
+
+    if (!result.ok) {
+      setCollabMessage(result.errorMessage);
+      return;
+    }
+
+    setCollabMessage("Collab request sent.");
+    window.setTimeout(() => {
+      setCollabOpen(false);
+      setCollabTrackItem(null);
+      setCollabMessage("");
+    }, 700);
   }
 
   if (!profile) {
@@ -87,10 +136,74 @@ export function PublicProfilePage() {
               items={profile.demos}
               onPlay={(track) => void toggleTrack(track)}
               onVote={(trackId, value) => void handleVote(trackId, value)}
+              onCollab={openCollab}
             />
           </section>
         </section>
       </section>
+      <Modal
+        open={collabOpen}
+        onClose={() => setCollabOpen(false)}
+        panelClassName="narrow-dialog-panel"
+        header={
+          <div className="panel-header row-between">
+            <div>
+              <p className="eyebrow">Collab request</p>
+              <h2>{collabTrackItem?.title || "Demo"}</h2>
+            </div>
+            <button className="btn ghost" type="button" onClick={() => setCollabOpen(false)}>
+              Close
+            </button>
+          </div>
+        }
+      >
+        <form
+          className="stack-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void handleCollabRequest(new FormData(event.currentTarget));
+          }}
+        >
+          <div className="field-group">
+            <span className="field-label">What can you add?</span>
+            <div className="compact-chip-grid">
+              {COLLAB_SKILLS.map((skill) => (
+                <label key={skill} className="check-chip">
+                  <input type="checkbox" name="skills" value={skill} />
+                  <span>{skill}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <label>
+            Message
+            <textarea name="message" rows={5} required placeholder="I like the hook and could add guitar layers or help with the mix." />
+          </label>
+          <label>
+            Contact
+            <select
+              name="contactPreference"
+              value={collabContactPreference}
+              onChange={(event) => setCollabContactPreference(event.target.value as "in-app" | "email" | "instagram")}
+            >
+              <option value="in-app">In-app first</option>
+              <option value="email">Email allowed</option>
+              <option value="instagram">Request Instagram contact after accept</option>
+            </select>
+          </label>
+          {collabContactPreference === "instagram" ? (
+            <label>
+              Instagram handle
+              <input name="instagramHandle" placeholder="producer.name" required />
+              <span className="field-hint">Only visible to the demo owner after accepting the request.</span>
+            </label>
+          ) : null}
+          <button className="btn primary" type="submit">
+            Send request
+          </button>
+          {collabMessage ? <div className={`msg ${collabMessage.includes("sent") ? "ok" : "err"}`}>{collabMessage}</div> : null}
+        </form>
+      </Modal>
     </main>
   );
 }
