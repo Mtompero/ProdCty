@@ -45,7 +45,7 @@ Az Aura színrendszer műfajhoz kötött, élénk palettákat használ. A demo f
 - A feltöltési, feedback, report és collab űrlapok modalban nyílnak, így a fő nézetek kevésbé zsúfoltak
 - A Library lista táblázatszerű, sávos megjelenést használ
 - A Demos nézet sávos elrendezésben mutatja a demókat, My Style / Top Voted szűrési módokkal
-- A Profile nézet saját és publikus feltöltéseket kezel, elkülönített sample/demo blokkokkal
+- A Profile nézet saját és publikus feltöltéseket kezel, elkülönített sample/demo blokkokkal; a saját profil szerkesztése modal ablakban történik
 - Mobilon az oszlopos elrendezések egyoszlopos szerkezetre törnek
 
 ## Komponensek
@@ -61,7 +61,7 @@ Az Aura színrendszer műfajhoz kötött, élénk palettákat használ. A demo f
 - collab request popup skill chipekkel, üzenettel és opcionális Instagram elérhetőséggel
 - library sorok szűrőkkel, keresési javaslatokkal és műfaj/instrumentum/típus metaadatokkal
 - demo sorok Aura waveformmal, upvote/downvote vezérléssel, Rate, Collab, Report és Play akciókkal
-- profil avatar, saját profil szerkesztés és publikus profilnézet
+- profil avatar, modal alapú saját profil szerkesztés és publikus profilnézet
 - kompakt genre választó chipek maximum három műfaj kijelöléséhez
 - admin AI review lista mini lejátszóval, AI indokkal, Clear AI flag és Review action művelettel
 - admin Review action popup sample törléshez, opcionális warninghoz vagy banhoz

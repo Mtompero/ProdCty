@@ -194,7 +194,7 @@ function CollabInbox() {
                       "Email will unlock after acceptance."
                     )
                   ) : (
-                    "In-app first."
+                    "No external contact was shared."
                   )}
                 </div>
                 <small className="muted">{formatDate(item.createdAt)}</small>

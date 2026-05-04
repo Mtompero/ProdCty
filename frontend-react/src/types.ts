@@ -171,7 +171,7 @@ export type CollabRequest = {
   requesterAvatarUrl?: string;
   message: string;
   skills: string[];
-  contactPreference: "in-app" | "email" | "instagram";
+  contactPreference: "email" | "instagram";
   requesterEmail?: string;
   emailVisible?: boolean;
   instagramHandle?: string;

@@ -6,11 +6,12 @@ import { INTEREST_OPTIONS } from "../lib/interests";
 import { useAuth } from "../contexts/AuthContext";
 import { usePlayer } from "../contexts/PlayerContext";
 import { InterestPicker } from "../components/InterestPicker";
+import { Modal } from "../components/Modal";
 import { ProfileTrackList } from "../components/ProfileTrackList";
 import type { ProfilePayload } from "../types";
 
 export function ProfilePage() {
-  const { token, user, setUser, refreshMe } = useAuth();
+  const { token, user, loading, setUser, refreshMe } = useAuth();
   const { toggleTrack } = usePlayer();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfilePayload | null>(null);
@@ -18,14 +19,16 @@ export function ProfilePage() {
   const [interests, setInterests] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
+    if (loading) return;
+    if (!user && !token) {
+      navigate("/login", { replace: true });
       return;
     }
-    void loadProfile(user.id);
-  }, [user?.id]);
+    if (user) void loadProfile(user.id);
+  }, [loading, navigate, token, user?.id]);
 
   async function loadProfile(userId: string) {
     const result = await fetchProfile(userId);
@@ -45,6 +48,7 @@ export function ProfilePage() {
     setUser(result.data.user);
     setMessage("Profile saved.");
     await loadProfile(result.data.user.id);
+    window.setTimeout(() => setEditOpen(false), 600);
   }
 
   async function handleAvatarUpload() {
@@ -82,37 +86,8 @@ export function ProfilePage() {
 
   return (
     <main className="page-shell app-shell">
-      <section className="app-layout">
-        <aside className="app-column app-sidebar">
-          <section className="surface-block">
-            <div className="panel-header">
-              <h2>Edit profile</h2>
-              <p className="muted">Update your avatar and a short bio.</p>
-            </div>
-            <div className="stack-form">
-              <label>
-                Profile image
-                <input type="file" accept="image/*" onChange={(event) => setAvatarFile(event.target.files?.[0] || null)} />
-              </label>
-              <button className="btn primary" type="button" onClick={() => void handleAvatarUpload()}>
-                Upload avatar
-              </button>
-              <label>
-                Bio
-                <textarea value={bio} rows={5} onChange={(event) => setBio(event.target.value)} placeholder="Tell people what you make." />
-              </label>
-              <div className="field-group">
-                <span className="field-label">Interests</span>
-                <InterestPicker options={INTEREST_OPTIONS} selected={interests} onChange={setInterests} />
-              </div>
-              <button className="btn" type="button" onClick={() => void handleSave()}>
-                Save profile
-              </button>
-              {message ? <div className={`msg ${message.includes("saved") || message.includes("updated") ? "ok" : "err"}`}>{message}</div> : null}
-            </div>
-          </section>
-        </aside>
-
+      <section className="app-layout profile-page-layout">
+        <aside className="app-column app-rail" aria-hidden="true" />
         <section className="app-column app-main">
           <section className="hero compact app-hero">
             <div className="profile-hero">
@@ -129,6 +104,9 @@ export function ProfilePage() {
                   {profile.user.interests.length ? `Interests: ${profile.user.interests.join(" | ")}` : "No interests listed yet."}
                 </p>
               </div>
+              <button className="btn ghost profile-edit-trigger" type="button" onClick={() => setEditOpen(true)}>
+                Edit profile
+              </button>
             </div>
           </section>
 
@@ -168,7 +146,48 @@ export function ProfilePage() {
             />
           </section>
         </section>
+        <aside className="app-column app-rail" aria-hidden="true" />
       </section>
+
+      <Modal
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        panelClassName="profile-edit-dialog-panel"
+        header={
+          <div className="panel-header row-between">
+            <div>
+              <p className="eyebrow">Artist profile</p>
+              <h2>Edit profile</h2>
+              <p className="muted">Update your avatar, bio and music interests.</p>
+            </div>
+            <button className="btn ghost" type="button" onClick={() => setEditOpen(false)}>
+              Close
+            </button>
+          </div>
+        }
+      >
+        <div className="stack-form">
+          <label>
+            Profile image
+            <input type="file" accept="image/*" onChange={(event) => setAvatarFile(event.target.files?.[0] || null)} />
+          </label>
+          <button className="btn primary" type="button" onClick={() => void handleAvatarUpload()}>
+            Upload avatar
+          </button>
+          <label>
+            Bio
+            <textarea value={bio} rows={5} onChange={(event) => setBio(event.target.value)} placeholder="Tell people what you make." />
+          </label>
+          <div className="field-group">
+            <span className="field-label">Interests</span>
+            <InterestPicker options={INTEREST_OPTIONS} selected={interests} onChange={setInterests} />
+          </div>
+          <button className="btn" type="button" onClick={() => void handleSave()}>
+            Save profile
+          </button>
+          {message ? <div className={`msg ${message.includes("saved") || message.includes("updated") ? "ok" : "err"}`}>{message}</div> : null}
+        </div>
+      </Modal>
     </main>
   );
 }

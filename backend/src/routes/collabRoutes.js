@@ -22,7 +22,7 @@ const COLLAB_SKILLS = [
   "songwriting",
   "other",
 ];
-const CONTACT_PREFERENCES = ["in-app", "email", "instagram"];
+const CONTACT_PREFERENCES = ["email", "instagram"];
 
 async function rejectBannedUser(req, res) {
   const user = await User.findById(req.user.id).select("moderationStatus moderationReason").lean().catch(() => null);
@@ -36,8 +36,9 @@ async function rejectBannedUser(req, res) {
 function collabRequestDto(item, viewerId) {
   const isRequester = item.requesterId === viewerId;
   const isAccepted = item.status === "accepted";
+  const contactPreference = CONTACT_PREFERENCES.includes(item.contactPreference) ? item.contactPreference : "email";
   const visibleInstagramHandle = isRequester || isAccepted ? item.instagramHandle || "" : "";
-  const visibleRequesterEmail = item.contactPreference === "email" && (isRequester || isAccepted)
+  const visibleRequesterEmail = contactPreference === "email" && (isRequester || isAccepted)
     ? item.requesterEmail || ""
     : "";
   return {
@@ -51,7 +52,7 @@ function collabRequestDto(item, viewerId) {
     requesterAvatarUrl: item.requesterAvatarUrl || "",
     message: item.message,
     skills: item.skills || [],
-    contactPreference: item.contactPreference || "in-app",
+    contactPreference,
     requesterEmail: visibleRequesterEmail,
     emailVisible: Boolean(visibleRequesterEmail),
     instagramHandle: visibleInstagramHandle,
@@ -86,10 +87,10 @@ router.post("/tracks/:trackId/collab-requests", requireAuth, async (req, res) =>
     const skills = normalizeTags(req.body ? req.body.skills : "")
       .filter((skill) => COLLAB_SKILLS.includes(skill))
       .slice(0, 5);
-    const requestedContactPreference = String((req.body && req.body.contactPreference) || "in-app").toLowerCase();
+    const requestedContactPreference = String((req.body && req.body.contactPreference) || "email").toLowerCase();
     const contactPreference = CONTACT_PREFERENCES.includes(requestedContactPreference)
       ? requestedContactPreference
-      : "in-app";
+      : "email";
     const instagramHandle = sanitizeOptionalText(req.body ? req.body.instagramHandle : "", 64)
       .replace(/^@+/, "")
       .replace(/[^a-z0-9._]/gi, "")

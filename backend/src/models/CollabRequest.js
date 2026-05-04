@@ -60,8 +60,8 @@ const collabRequestSchema = new mongoose.Schema(
     },
     contactPreference: {
       type: String,
-      enum: ["in-app", "email", "instagram"],
-      default: "in-app",
+      enum: ["email", "instagram"],
+      default: "email",
     },
     instagramHandle: {
       type: String,

@@ -242,7 +242,7 @@ export async function reportTrack(
 export async function sendCollabRequest(
   token: string,
   trackId: string,
-  payload: { message: string; skills: string[]; contactPreference: "in-app" | "email" | "instagram"; instagramHandle?: string }
+  payload: { message: string; skills: string[]; contactPreference: "email" | "instagram"; instagramHandle?: string }
 ) {
   return request<{ ok: true; request: CollabRequest }>(`/tracks/${trackId}/collab-requests`, {
     method: "POST",

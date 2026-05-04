@@ -85,7 +85,7 @@ export function DemosPage() {
   const [collabOpen, setCollabOpen] = useState(false);
   const [collabTrackItem, setCollabTrackItem] = useState<Track | null>(null);
   const [collabMessage, setCollabMessage] = useState("");
-  const [collabContactPreference, setCollabContactPreference] = useState<"in-app" | "email" | "instagram">("in-app");
+  const [collabContactPreference, setCollabContactPreference] = useState<"email" | "instagram">("email");
   const [commentReportOpen, setCommentReportOpen] = useState(false);
   const [reportCommentItem, setReportCommentItem] = useState<Comment | null>(null);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -284,7 +284,7 @@ export function DemosPage() {
     if (track.userId === user?.id) return;
     setCollabTrackItem(track);
     setCollabMessage("");
-    setCollabContactPreference("in-app");
+    setCollabContactPreference("email");
     setCollabOpen(true);
   }
 
@@ -297,11 +297,9 @@ export function DemosPage() {
     const result = await sendCollabRequest(token, collabTrackItem.id, {
       message: String(formData.get("message") || ""),
       skills: formData.getAll("skills").map((item) => String(item)),
-      contactPreference: String(formData.get("contactPreference") || "in-app") === "instagram"
+      contactPreference: String(formData.get("contactPreference") || "email") === "instagram"
         ? "instagram"
-        : String(formData.get("contactPreference") || "in-app") === "email"
-          ? "email"
-          : "in-app",
+        : "email",
       instagramHandle: String(formData.get("instagramHandle") || ""),
     });
 
@@ -729,10 +727,9 @@ export function DemosPage() {
             <select
               name="contactPreference"
               value={collabContactPreference}
-              onChange={(event) => setCollabContactPreference(event.target.value as "in-app" | "email" | "instagram")}
+              onChange={(event) => setCollabContactPreference(event.target.value as "email" | "instagram")}
             >
-              <option value="in-app">In-app first</option>
-              <option value="email">Email allowed</option>
+              <option value="email">Email after accept</option>
               <option value="instagram">Request Instagram contact after accept</option>
             </select>
           </label>

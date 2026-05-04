@@ -44,8 +44,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const result = await api.fetchMe(token);
     if (!result.ok || !result.data) {
-      localStorage.removeItem(TOKEN_KEY);
-      setToken("");
+      if (result.status === 401 || result.status === 403) {
+        localStorage.removeItem(TOKEN_KEY);
+        setToken("");
+      }
       setUser(null);
       setLoading(false);
       return;
