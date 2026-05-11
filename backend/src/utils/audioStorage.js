@@ -73,11 +73,28 @@ async function storeUploadedAudio(file) {
   return getStoredAudioMeta(file);
 }
 
+async function inspectUploadedAudioDurationSec(file) {
+  if (!file) return null;
+
+  try {
+    const { parseBuffer, parseFile } = await import("music-metadata");
+    const metadata = file.buffer
+      ? await parseBuffer(file.buffer, { mimeType: file.mimetype })
+      : await parseFile(file.path);
+    const duration = Number(metadata && metadata.format && metadata.format.duration);
+    if (!Number.isFinite(duration) || duration <= 0) return null;
+    return Math.round(duration);
+  } catch {
+    return null;
+  }
+}
+
 module.exports = {
   ensureUploadDir,
   createAudioUploadMiddleware,
   getExtensionFromMimeType,
   getStoredAudioMeta,
+  inspectUploadedAudioDurationSec,
   isAllowedAudioMimeType,
   removeStoredFile,
   storeUploadedAudio,

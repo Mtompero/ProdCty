@@ -22,7 +22,11 @@ function createApp() {
 
   app.use(cors({
     origin(origin, callback) {
-      if (!origin || !allowedOrigins.length || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+      if (!allowedOrigins.length && process.env.NODE_ENV !== "production") {
         callback(null, true);
         return;
       }

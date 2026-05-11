@@ -15,6 +15,7 @@ const TrackVote = require("../models/TrackVote");
 const User = require("../models/User");
 const {
   createAudioUploadMiddleware,
+  inspectUploadedAudioDurationSec,
   removeStoredFile,
   storeUploadedAudio,
 } = require("../utils/audioStorage");
@@ -430,6 +431,7 @@ router.delete("/tracks/:id", requireAuth, async (req, res) => {
     await CollabRequest.deleteMany({ trackId: track._id });
     await Comment.deleteMany({ trackId: track._id.toString() });
     await Rating.deleteMany({ trackId: track._id.toString() });
+    await Report.deleteMany({ trackId: track._id });
     await TrackVote.deleteMany({ trackId: track._id });
     await Track.deleteOne({ _id: track._id });
 
@@ -546,9 +548,8 @@ router.post("/tracks", requireAuth, multerSingleAudio, async (req, res) => {
     const description = sanitizeOptionalText(req.body ? req.body.description : "", 500);
     const musicalKey = sanitizeOptionalText(req.body ? req.body.musicalKey : "", 16);
     const bpm = parseOptionalNumber(req.body ? req.body.bpm : null, 1, 400);
-    const durationSec = parseDurationSec(req.body ? req.body.durationSec : null);
+    const clientDurationSec = parseDurationSec(req.body ? req.body.durationSec : null);
     const audioCheck = validateUploadedAudioFile(req.file);
-    const durationCheck = validateTrackDurationLimit(kind, durationSec);
 
     if (!isNonEmptyString(title)) {
       await removeStoredFile(req.file && req.file.path);
@@ -558,6 +559,10 @@ router.post("/tracks", requireAuth, multerSingleAudio, async (req, res) => {
       await removeStoredFile(req.file && req.file.path);
       return jsonError(res, 400, "VALIDATION_ERROR", audioCheck.message);
     }
+
+    const measuredDurationSec = await inspectUploadedAudioDurationSec(req.file);
+    const durationSec = measuredDurationSec || clientDurationSec;
+    const durationCheck = validateTrackDurationLimit(kind, durationSec);
     if (!durationCheck.ok) {
       await removeStoredFile(req.file && req.file.path);
       return jsonError(res, 400, "VALIDATION_ERROR", durationCheck.message);

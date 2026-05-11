@@ -22,52 +22,45 @@ A jelenlegi frontend React + TypeScript + Vite alapú, a forrása a `frontend-re
 
 ## Képernyők
 
-- `S01` - Auth
-- `S02` - Library
-- `S03` - Library Upload Sample
-- `S04` - Demos
-- `S05` - Demo Upload Aura
-- `S06` - Demo Feedback Popup
-- `S07` - Collab Request Popup
-- `S08` - Header Collab Inbox
-- `S09` - Own Profile
-- `S10` - Public Profile
-- `S11` - Admin Overview
-- `S12` - Admin Reports Review
-- `S13` - Admin Users Moderation
-- `S14` - Admin AI Review
-- `S15` - Admin AI Review Action
+- `S01` - Login
+- `S02` - Register
+- `S03` - Library
+- `S04` - Library Upload Sample
+- `S05` - License Confirmation
+- `S06` - Demos
+- `S07` - Demo Upload Aura
+- `S08` - Demo Feedback Popup
+- `S09` - Collab Request Popup
+- `S10` - Header Collab Inbox
+- `S11` - Own Profile
+- `S12` - Edit Profile Popup
+- `S13` - Public Profile
+- `S14` - Admin Overview
+- `S15` - Admin Reports Review
+- `S16` - Admin Users Moderation
+- `S17` - Admin AI Review
+- `S18` - Admin AI Review Action
 
 Ajánlott screenshot fájlnevek a `screenshots/` mappában:
 
-- `S01_auth.png`
-- `S02_library.png`
-- `S03_library_upload_sample.png`
-- `S04_demos.png`
-- `S05_demo_upload_aura.png`
-- `S06_demo_feedback_popup.png`
-- `S07_collab_request_popup.png`
-- `S08_collab_inbox.png`
-- `S09_own_profile.png`
-- `S10_public_profile.png`
-- `S11_admin_overview.png`
-- `S12_admin_reports_review.png`
-- `S13_admin_users_moderation.png`
-- `S14_admin_ai_review.png`
-- `S15_admin_ai_review_action.png`
-
-## Frissített screenshotok
-
-A jelenlegi UI állapothoz a meglévő képek mellé elkészültek ezek:
-
-- `S14_admin_ai_review.png` - Admin felület `AI review` tabja, legalább egy gyanús sample-lel, mini lejátszóval, `Review action` és `Clear AI flag` gombbal.
-- `S15_admin_ai_review_action.png` - Az `AI review` tabon a `Review action` popup megnyitva, benne a delete / warn / ban jellegű döntési lehetőségekkel és üzenetmezővel.
-
-Újrakészült képek a legutóbbi felületi változások miatt:
-
-- `S04_demos.png` - új fejléc, upload gomb, Aura waveform és szélesebb action oszlop miatt.
-- `S11_admin_overview.png` - az admin dashboardon már külön `AI review` tab és suspicious sample statisztika is van.
-- `S13_admin_users_moderation.png` - ha a user moderation popup új, középre zárt formként látszik.
+- `S01_login.png`
+- `S02_register.png`
+- `S03_library.png`
+- `S04_library_upload_sample.png`
+- `S05_license_confirm.png`
+- `S06_demos.png`
+- `S07_demo_upload_aura.png`
+- `S08_demo_feedback_popup.png`
+- `S09_collab_request_popup.png`
+- `S10_collab_inbox.png`
+- `S11_own_profile.png`
+- `S12_edit_profile_popup.png`
+- `S13_public_profile.png`
+- `S14_admin_overview.png`
+- `S15_admin_reports_review.png`
+- `S16_admin_users_moderation.png`
+- `S17_admin_ai_review.png`
+- `S18_admin_ai_review_action.png`
 
 ## Beadási állapot
 

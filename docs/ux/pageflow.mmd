@@ -1,29 +1,37 @@
 flowchart TB
-    A["S01 - Auth"]
+    L["S01 - Login"]
+    R["S02 - Register"]
 
-    subgraph APP["React authenticated app shell"]
+    subgraph APP["React app shell"]
         direction LR
-        B["S02 - Library"]
-        C["S03 - Library Upload Sample"]
-        D["S04 - Demos"]
-        E["S05 - Demo Upload Aura"]
-        F["S06 - Demo Feedback Popup"]
-        G["S07 - Collab Request Popup"]
-        H["S08 - Header Collab Inbox"]
-        I["S09 - Own Profile"]
-        J["S10 - Public Profile"]
-        K["S11 - Admin Overview"]
-        L["S12 - Admin Reports Review"]
-        M["S13 - Admin Users Moderation"]
-        N["S14 - Admin AI Review"]
-        O["S15 - Admin AI Review Action"]
+        B["S03 - Library"]
+        C["S04 - Library Upload Sample"]
+        LC["S05 - License Confirmation"]
+        D["S06 - Demos"]
+        E["S07 - Demo Upload Aura"]
+        F["S08 - Demo Feedback Popup"]
+        G["S09 - Collab Request Popup"]
+        H["S10 - Header Collab Inbox"]
+        I["S11 - Own Profile"]
+        P["S12 - Edit Profile Popup"]
+        J["S13 - Public Profile"]
+        K["S14 - Admin Overview"]
+        M["S15 - Admin Reports Review"]
+        U["S16 - Admin Users Moderation"]
+        N["S17 - Admin AI Review"]
+        O["S18 - Admin AI Review Action"]
     end
 
-    A -->|"Login / Register"| B
+    L -->|"Register link"| R
+    R -->|"Back to login"| L
+    L -->|"Successful login"| B
+    R -->|"Successful register"| B
 
     B <-->|"Top navigation"| D
     B -->|"Upload sample"| C
-    C -->|"Saved / close"| B
+    C -->|"Submit upload"| LC
+    LC -->|"Confirmed / saved"| B
+    LC -->|"Cancel"| C
 
     D -->|"Upload demo"| E
     E -->|"Aura generated / saved"| D
@@ -35,25 +43,27 @@ flowchart TB
 
     B -->|"Profile icon"| I
     D -->|"Profile icon"| I
+    I -->|"Edit profile"| P
+    P -->|"Save / close"| I
     B -->|"Uploader link / creator search"| J
     D -->|"Uploader link / creator search"| J
     F -->|"Comment author link"| J
     I -->|"Public creator link"| J
     J -->|"Own profile icon"| I
 
-    K -->|"Open reports"| L
-    K -->|"Users tab"| M
+    K -->|"Open reports"| M
+    K -->|"Users tab"| U
     K -->|"AI review tab"| N
-    L -->|"Reviewed / actioned"| K
-    M -->|"Warn / ban / clear"| K
+    M -->|"Reviewed / actioned"| K
+    U -->|"Warn / ban / clear"| K
     N -->|"Review action"| O
     O -->|"Delete / warn / ban / clear flag"| N
 
     B -->|"Admin nav, admin only"| K
     D -->|"Admin nav, admin only"| K
 
-    B -->|"Logout"| A
-    D -->|"Logout"| A
-    I -->|"Logout"| A
-    J -->|"Logout"| A
-    K -->|"Logout"| A
+    B -->|"Logout"| L
+    D -->|"Logout"| L
+    I -->|"Logout"| L
+    J -->|"Logout"| L
+    K -->|"Logout"| L

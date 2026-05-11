@@ -17,11 +17,28 @@ const { trackDto, commentDto } = require("../utils/serializers");
 
 const router = express.Router();
 
-function requireAdmin(req, res, next) {
+async function requireAdmin(req, res, next) {
   if (!req.user || req.user.role !== "admin") {
     return jsonError(res, 403, "FORBIDDEN", "Admin access required.");
   }
-  return next();
+  try {
+    const admin = await User.findById(req.user.id)
+      .select("_id username email role moderationStatus moderationReason")
+      .lean();
+    if (!admin || admin.role !== "admin" || admin.moderationStatus === "banned") {
+      return jsonError(res, 403, "FORBIDDEN", "Admin access required.");
+    }
+    req.user = {
+      ...req.user,
+      username: admin.username || req.user.username,
+      email: admin.email || req.user.email,
+      role: admin.role,
+      moderationStatus: admin.moderationStatus || "active",
+    };
+    return next();
+  } catch (err) {
+    return jsonError(res, 500, "INTERNAL_ERROR", "Failed to verify admin permissions.");
+  }
 }
 
 router.use(requireAuth, requireAdmin);
@@ -59,6 +76,23 @@ async function deleteUserUploads(userId) {
   ]);
 
   return tracks.length;
+}
+
+async function deleteTrackAndRelatedData(track) {
+  await removeStoredAudioFile(track.storagePath, track.storageProvider, track.storageResourceType);
+  await Promise.all([
+    CollabRequest.deleteMany({ trackId: track._id }),
+    Comment.deleteMany({ trackId: track._id.toString() }),
+    Rating.deleteMany({ trackId: track._id.toString() }),
+    TrackVote.deleteMany({ trackId: track._id }),
+    Report.deleteMany({
+      $or: [
+        { trackId: track._id },
+        { trackId: track._id.toString() },
+      ],
+    }),
+  ]);
+  await Track.deleteOne({ _id: track._id });
 }
 
 router.get("/overview", async (req, res) => {
@@ -331,13 +365,7 @@ router.delete("/tracks/:id", async (req, res) => {
       return jsonError(res, 404, "TRACK_NOT_FOUND", "Track not found.");
     }
 
-    await removeStoredAudioFile(track.storagePath, track.storageProvider, track.storageResourceType);
-    await Promise.all([
-      Comment.deleteMany({ trackId: track._id.toString() }),
-      Rating.deleteMany({ trackId: track._id.toString() }),
-      TrackVote.deleteMany({ trackId: track._id }),
-    ]);
-    await Track.deleteOne({ _id: track._id });
+    await deleteTrackAndRelatedData(track);
 
     return res.json({ ok: true });
   } catch (err) {

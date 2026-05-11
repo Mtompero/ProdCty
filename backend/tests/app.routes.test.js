@@ -9,6 +9,7 @@ jest.mock("../src/utils/audioStorage", () => ({
     single: () => (req, res, next) => next(),
   }),
   getStoredAudioMeta: jest.fn(),
+  inspectUploadedAudioDurationSec: jest.fn().mockResolvedValue(null),
   removeStoredFile: jest.fn(),
 }));
 
@@ -90,6 +91,23 @@ function chainableFind(result) {
     limit: jest.fn().mockReturnThis(),
     lean: jest.fn().mockResolvedValue(result),
   };
+}
+
+function chainableFindById(result) {
+  return {
+    select: jest.fn().mockReturnThis(),
+    lean: jest.fn().mockResolvedValue(result),
+  };
+}
+
+function mockFreshAdmin() {
+  User.findById.mockReturnValueOnce(chainableFindById({
+    _id: "admin1",
+    username: "admin",
+    email: "admin@admin.com",
+    role: "admin",
+    moderationStatus: "active",
+  }));
 }
 
 describe("app routes", () => {
@@ -332,15 +350,39 @@ describe("app routes", () => {
     expect(response.body.error.code).toBe("FORBIDDEN");
   });
 
+  test("admin overview rejects a stale admin token after role revocation", async () => {
+    const token = jwt.sign(
+      { sub: "admin1", username: "admin", email: "admin@admin.com", role: "admin" },
+      process.env.JWT_SECRET
+    );
+    User.findById.mockReturnValueOnce(chainableFindById({
+      _id: "admin1",
+      username: "admin",
+      email: "admin@admin.com",
+      role: "user",
+      moderationStatus: "active",
+    }));
+
+    const app = createApp();
+    const response = await request(app)
+      .get("/admin/overview")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(response.status).toBe(403);
+    expect(response.body.error.code).toBe("FORBIDDEN");
+  });
+
   test("admin overview returns moderation statistics for admins", async () => {
     const token = jwt.sign(
       { sub: "admin1", username: "admin", email: "admin@admin.com", role: "admin" },
       process.env.JWT_SECRET
     );
+    mockFreshAdmin();
 
     User.countDocuments.mockResolvedValueOnce(3);
     Track.countDocuments.mockResolvedValueOnce(4);
     Track.countDocuments.mockResolvedValueOnce(2);
+    Track.countDocuments.mockResolvedValueOnce(1);
     Comment.countDocuments.mockResolvedValueOnce(5);
     Rating.countDocuments.mockResolvedValueOnce(6);
     Report.countDocuments.mockResolvedValueOnce(2);
@@ -377,6 +419,7 @@ describe("app routes", () => {
       process.env.JWT_SECRET
     );
     const save = jest.fn().mockResolvedValue(undefined);
+    mockFreshAdmin();
     User.findById.mockResolvedValueOnce({
       _id: "u2",
       username: "repeat-offender",
@@ -408,6 +451,7 @@ describe("app routes", () => {
       { sub: "admin1", username: "admin", email: "admin@admin.com", role: "admin" },
       process.env.JWT_SECRET
     );
+    mockFreshAdmin();
 
     const app = createApp();
     const response = await request(app)
@@ -417,7 +461,7 @@ describe("app routes", () => {
 
     expect(response.status).toBe(400);
     expect(response.body.error.code).toBe("VALIDATION_ERROR");
-    expect(User.findById).not.toHaveBeenCalled();
+    expect(User.findById).toHaveBeenCalledTimes(1);
   });
 
   test("admin moderation rejects other admin accounts", async () => {
@@ -425,6 +469,7 @@ describe("app routes", () => {
       { sub: "admin1", username: "admin", email: "admin@admin.com", role: "admin" },
       process.env.JWT_SECRET
     );
+    mockFreshAdmin();
     User.findById.mockResolvedValueOnce({
       _id: "admin2",
       username: "other-admin",
